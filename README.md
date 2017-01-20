@@ -1,2 +1,0 @@
-# ctrace-javascript
-Canonical OpenTracing 
