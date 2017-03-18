@@ -3,6 +3,9 @@ node_js:
   - "7"
   - "6"
   - "4.3"
+script:
+  - npm run lint
+  - npm test  
 after_success:
-  - npm run coverage
+  - npm run coveralls
   - npm run bench
