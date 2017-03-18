@@ -1,6 +1,6 @@
 {
-  "name": "ctrace",
-  "version": "0.2.0",
+  "name": "ctrace-js",
+  "version": "0.0.0",
   "description": "Canonical OpenTracing for Javascript",
   "main": "index.js",
   "scripts": {
