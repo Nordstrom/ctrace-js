@@ -28,11 +28,7 @@ Add instrumentation to the operations you want to track. This is composed primar
 First, initialize global tracer as follows.
 
 ```js
-const opentracing = require('opentracing')
-const Tracer = require('ctrace')
-const tracer = opentracing.globalTracer()
-
-opentracing.initGlobalTracer(new Tracer())
+const tracer = require('ctrace')
 ```
 
 ### Client HTTP Requests
@@ -66,10 +62,10 @@ Add the Express Middleware as follows to trace HTTP REST server calls.
 
 ```js
 const express = require('express')
-const Tracer = require('ctrace')
+const tracer = require('ctrace')
 const app = express()
 
-app.use(Tracer.express)
+app.use(tracer.express)
 
 app.post('/users', (req, res) => {
   ...
@@ -124,11 +120,10 @@ The called REST service can start a server Span as follows.
 ```js
 const express = require('express')
 const app = express()
-const Tracer = require('ctrace')
-const tracer = new Tracer()
+const tracer = require('ctrace')
 
 app.post('/users', (req, res) => {
-  const context = tracer.extract(Tracer.FORMAT_HTTP_HEADERS, req.headers)
+  const context = tracer.extract(tracer.FORMAT_HTTP_HEADERS, req.headers)
   const span = tracer.startSpan('RegisterUser', {
     childOf: context,  // include parent context
     // Standard Tags
@@ -203,7 +198,7 @@ span.finish()
 
 ## API
 
-* **[new Tracer (options)](#new-tracer-options)**
+* **[tracer.init (options)](#tracerinit-options)**
 * **[tracer.startSpan (name, fields)](#tracerstartspan-name-fields)**
 * **[tracer.inject (spanContext, format, carrier)](#tracerinject-spancontext-format-carrier)**
 * **[tracer.extract (format, carrier)](#tracerextract-format-carrier)**
@@ -211,7 +206,7 @@ span.finish()
 * **[span.addTags (keyValues)](#spanaddtags-keyvalues)**
 * **[span.finish ([timestamp])](#spanfinish--timestamp)**
 
-### new Tracer (options)
+### tracer.init (options)
 Create a new Tracer instance.  Ideally this should be done once for each application.
 
 #### options
@@ -384,6 +379,15 @@ Optional finish time in milliseconds as a Unix timestamp. Decimal
 values are supported for timestamps with sub-millisecond accuracy.
 If not specified, the current time (as defined by the
 implementation) will be used.
+
+## Roadmap
+- [x] Core Start, Log, and Finish Span
+- [x] Inject, Extract to Text and Header formats
+- [ ] Inject, Extract to Binary format
+- [x] Express Middleware support
+- [x] Request and Request-Promise interceptor support
+- [ ] Kinesis, Lambda and Plain Lambda wrapper support
+- [ ] API Gateway / Lambda in Proxy Mode support
 
 [ci-img]: https://travis-ci.org/Nordstrom/ctrace-js.svg?branch=new
 [ci]: https://travis-ci.org/Nordstrom/ctrace-js
