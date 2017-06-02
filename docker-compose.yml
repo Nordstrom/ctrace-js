@@ -1,0 +1,38 @@
+version: '3'
+networks:
+  main:
+    driver: bridge
+
+services:
+  gw:
+    build:
+      context: .
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${https_proxy}"
+
+    image: ctrace-demo-js
+    networks:
+      - main
+    ports:
+      - "8006:80"
+    environment:
+      http_proxy: "${http_proxy}"
+      https_proxy: "${https_proxy}"
+      no_proxy: ctrace_hello_1
+
+  hello:
+    build:
+      context: .
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${https_proxy}"
+
+    image: ctrace-demo-js
+    networks:
+      - main
+    ports:
+      - "8007:80"
+    environment:
+      http_proxy: "${http_proxy}"
+      https_proxy: "${https_proxy}"
