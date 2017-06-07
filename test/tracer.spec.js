@@ -34,14 +34,12 @@ describe('tracer', () => {
       span._tracer.should.not.be.empty()
     })
 
-    it('should start originating span with baggage and tags', () => {
+    it('should start originating span with tags', () => {
       let span = tracer.startSpan('originating', {
-        tags: {tag1: 'val1'},
-        baggage: {bag1: 'val2'}
+        tags: {tag1: 'val1'}
       })
       let fields = span._fields
       fields.tags.tag1.should.equal('val1')
-      fields.baggage.bag1.should.equal('val2')
     })
 
     it('should not output on start span', () => {

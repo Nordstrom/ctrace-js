@@ -1,40 +1,22 @@
-'use strict';
+import {FORMAT_HTTP_HEADERS, FORMAT_TEXT_MAP} from 'opentracing'
+import Span from './span.js'
+import Reporter from './reporter.js'
+import Encoder from './encoder.js'
+import {randomBytes as rb} from 'crypto'
+import TextPropagator from './propagators/textPropagator'
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _opentracing = require('opentracing');
-
-var _span = require('./span.js');
-
-var _span2 = _interopRequireDefault(_span);
-
-var _reporter = require('./reporter.js');
-
-var _reporter2 = _interopRequireDefault(_reporter);
-
-var _encoder = require('./encoder.js');
-
-var _encoder2 = _interopRequireDefault(_encoder);
-
-var _crypto = require('crypto');
-
-var _textPropagator = require('./propagators/textPropagator');
-
-var _textPropagator2 = _interopRequireDefault(_textPropagator);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const bth = [];
+const bth = []
 for (var i = 0; i < 256; ++i) {
-  bth[i] = (i + 0x100).toString(16).substr(1);
+  bth[i] = (i + 0x100).toString(16).substr(1)
 }
 
-function genId() {
-  const buf = (0, _crypto.randomBytes)(8);
-  let i = 0;
-  return bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]] + bth[buf[i++]];
+function genId () {
+  const buf = rb(8)
+  let i = 0
+  return bth[buf[i++]] + bth[buf[i++]] +
+    bth[buf[i++]] + bth[buf[i++]] +
+    bth[buf[i++]] + bth[buf[i++]] +
+    bth[buf[i++]] + bth[buf[i++]]
 }
 
 /**
@@ -48,32 +30,32 @@ function genId() {
  * underscore-prefixed methods to pick up the argument checking and handling
  * automatically from the base class.
  */
-class Tracer {
+export default class Tracer {
   /**
    * Construct a new tracer.
    *
    * @param {object} opts
    */
-  constructor(options = {}) {
-    this._reporter = options.reporter || new _reporter2.default(_encoder2.default, options.stream);
-    this.multiEvent = options.multiEvent || false;
-    this.debug = options.debug || false;
-    this._propagation = {};
+  constructor (options = {}) {
+    this._reporter = options.reporter || new Reporter(Encoder, options.stream)
+    this.multiEvent = options.multiEvent || false
+    this.debug = options.debug || false
+    this._propagation = {}
 
     if (!options._replacePropagators) {
-      this._propagation[_opentracing.FORMAT_HTTP_HEADERS] = [new _textPropagator2.default()];
-      this._propagation[_opentracing.FORMAT_TEXT_MAP] = [new _textPropagator2.default()];
+      this._propagation[FORMAT_HTTP_HEADERS] = [new TextPropagator()]
+      this._propagation[FORMAT_TEXT_MAP] = [new TextPropagator()]
     }
 
-    const props = options.propagators;
+    const props = options.propagators
     if (props) {
       for (let key of Object.keys(props)) {
-        let list = this._propagation[key];
+        let list = this._propagation[key]
         if (!list) {
-          list = [];
-          this._propagation[key] = list;
+          list = []
+          this._propagation[key] = list
         }
-        list.concat(props[key]);
+        list.concat(props[key])
       }
     }
   }
@@ -107,27 +89,27 @@ class Tracer {
    *        should not modify this object after calling startSpan).
    * @return {Span} - a new Span object.
    */
-  startSpan(name, options = {}) {
-    const now = Date.now() * 1000;
+  startSpan (name, options = {}) {
+    const now = Date.now() * 1000
 
-    let ref = options.childOf && options.childOf._fields || options.childOf;
+    let ref = (options.childOf && options.childOf._fields) || options.childOf
 
-    const spanId = genId();
+    const spanId = genId()
 
-    let traceId = spanId;
-    let parentId;
-    let baggage;
+    let traceId = spanId
+    let parentId
+    let baggage
 
     if (ref && ref.traceId && ref.spanId) {
-      traceId = ref.traceId;
-      parentId = ref.spanId;
+      traceId = ref.traceId
+      parentId = ref.spanId
     }
 
     if (ref && ref.baggage) {
-      baggage = ref.baggage;
+      baggage = ref.baggage
     }
 
-    let f;
+    let f
 
     if (parentId) {
       f = {
@@ -136,36 +118,36 @@ class Tracer {
         parentId: parentId,
         operation: name,
         start: now
-      };
+      }
     } else {
       f = {
         traceId: traceId,
         spanId: spanId,
         operation: name,
         start: now
-      };
+      }
     }
 
-    f.operation = name;
-    f.start = now;
+    f.operation = name
+    f.start = now
 
     if (options.tags) {
-      f.tags = options.tags;
+      f.tags = options.tags
     }
 
     if (baggage) {
-      f.baggage = baggage;
+      f.baggage = baggage
     }
 
     f.logs = [{
       timestamp: now,
       event: 'Start-Span'
-    }];
+    }]
 
     if (this.multiEvent) {
-      this._reporter.report(f);
+      this._reporter.report(f)
     }
-    return new _span2.default(this, f);
+    return new Span(this, f)
   }
 
   /**
@@ -197,10 +179,10 @@ class Tracer {
    * @param  {any} carrier - see the documentation for the chosen `format`
    *         for a description of the carrier object.
    */
-  inject(spanContext, format, carrier) {
-    const propagation = this._propagation[format];
+  inject (spanContext, format, carrier) {
+    const propagation = this._propagation[format]
     for (let prop of propagation) {
-      prop.inject(spanContext, carrier);
+      prop.inject(spanContext, carrier)
     }
   }
 
@@ -226,18 +208,16 @@ class Tracer {
    *         The extracted SpanContext, or null if no such SpanContext could
    *         be found in `carrier`
    */
-  extract(format, carrier) {
-    const propagation = this._propagation[format];
+  extract (format, carrier) {
+    const propagation = this._propagation[format]
     for (let prop of propagation) {
-      let ctx = prop.extract(carrier);
-      if (ctx) return ctx;
+      let ctx = prop.extract(carrier)
+      if (ctx) return ctx
     }
-    return undefined;
+    return undefined
   }
 
-  report(fields) {
-    return this._reporter.report(fields);
+  report (fields) {
+    return this._reporter.report(fields)
   }
 }
-exports.default = Tracer;
-module.exports = exports['default'];

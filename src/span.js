@@ -1,14 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _opentracing = require('opentracing');
-
-var _opentracing2 = _interopRequireDefault(_opentracing);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+import opentracing from 'opentracing'
 
 /**
  * Span represents a logical unit of work as part of a broader Trace. Examples
@@ -16,15 +6,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * to sub-components. A Trace has a single, top-level "root" Span that in turn
  * may have zero or more child Spans, which in turn may have children.
  */
-class Span extends _opentracing2.default.Span {
+export default class Span extends opentracing.Span {
   // ---------------------------------------------------------------------- //
   // OpenTracing API methods
   // ---------------------------------------------------------------------- //
 
-  constructor(tracer, fields) {
-    super();
-    this._tracer = tracer;
-    this._fields = fields;
+  constructor (tracer, fields) {
+    super()
+    this._tracer = tracer
+    this._fields = fields
   }
 
   /**
@@ -32,7 +22,7 @@ class Span extends _opentracing2.default.Span {
    *
    * @return {SpanContext}
    */
-  context() {
+  context () {
     return this._fields.baggage ? {
       traceId: this._fields.traceId,
       spanId: this._fields.spanId,
@@ -40,7 +30,7 @@ class Span extends _opentracing2.default.Span {
     } : {
       traceId: this._fields.traceId,
       spanId: this._fields.spanId
-    };
+    }
   }
 
   /**
@@ -48,8 +38,8 @@ class Span extends _opentracing2.default.Span {
    *
    * @return {Tracer}
    */
-  tracer() {
-    return this._tracer;
+  tracer () {
+    return this._tracer
   }
 
   /**
@@ -57,9 +47,9 @@ class Span extends _opentracing2.default.Span {
    *
    * @param {string} name
    */
-  setOperationName(name) {
-    this._fields.operation = name;
-    return this;
+  setOperationName (name) {
+    this._fields.operation = name
+    return this
   }
 
   /**
@@ -82,10 +72,10 @@ class Span extends _opentracing2.default.Span {
    * @param {string} key
    * @param {string} value
    */
-  setBaggageItem(key, value) {
-    if (!this._fields.baggage) this._fields.baggage = {};
-    this._fields.baggage[key] = value;
-    return this;
+  setBaggageItem (key, value) {
+    if (!this._fields.baggage) this._fields.baggage = {}
+    this._fields.baggage[key] = value
+    return this
   }
 
   /**
@@ -97,8 +87,8 @@ class Span extends _opentracing2.default.Span {
    *         String value for the given key, or undefined if the key does not
    *         correspond to a set trace attribute.
    */
-  getBaggageItem(key) {
-    return this._fields.baggage && this._fields.baggage[key];
+  getBaggageItem (key) {
+    return this._fields.baggage && this._fields.baggage[key]
   }
 
   /**
@@ -107,9 +97,9 @@ class Span extends _opentracing2.default.Span {
    * @param {string} key
    * @param {any} value
    */
-  setTag(key, value) {
-    this.addTags({ [key]: value });
-    return this;
+  setTag (key, value) {
+    this.addTags({ [key]: value })
+    return this
   }
 
   /**
@@ -128,13 +118,13 @@ class Span extends _opentracing2.default.Span {
    *
    * @return {[type]} [description]
    */
-  addTags(keyValues) {
-    const tags = this._fields.tags || {};
+  addTags (keyValues) {
+    const tags = this._fields.tags || {}
     for (let key of Object.keys(keyValues)) {
-      tags[key] = keyValues[key];
+      tags[key] = keyValues[key]
     }
-    this._fields.tags = tags;
-    return this;
+    this._fields.tags = tags
+    return this
   }
 
   /**
@@ -164,18 +154,18 @@ class Span extends _opentracing2.default.Span {
    *        not specified, the implementation is expected to use its notion
    *        of the current time of the call.
    */
-  log(keyValues, timestamp) {
-    if (!timestamp) timestamp = keyValues.timestamp || Date.now();
-    timestamp *= 1000;
-    keyValues.timestamp = timestamp;
-    if (!this._fields.logs) this._fields.logs = [];
+  log (keyValues, timestamp) {
+    if (!timestamp) timestamp = keyValues.timestamp || Date.now()
+    timestamp *= 1000
+    keyValues.timestamp = timestamp
+    if (!this._fields.logs) this._fields.logs = []
     if (this._tracer.multiEvent) {
-      this._fields.logs[0] = keyValues;
-      this._tracer.report(this._fields);
+      this._fields.logs[0] = keyValues
+      this._tracer.report(this._fields)
     } else {
-      this._fields.logs.push(keyValues);
+      this._fields.logs.push(keyValues)
     }
-    return this;
+    return this
   }
 
   /**
@@ -191,25 +181,23 @@ class Span extends _opentracing2.default.Span {
    *         If not specified, the current time (as defined by the
    *         implementation) will be used.
    */
-  finish(finishTime) {
-    if (this._finished) return;
-    if (!finishTime) finishTime = Date.now() * 1000;
-    this._fields.duration = finishTime - this._fields.start;
+  finish (finishTime) {
+    if (this._finished) return
+    if (!finishTime) finishTime = Date.now() * 1000
+    this._fields.duration = finishTime - this._fields.start
 
     let log = {
       timestamp: finishTime,
       event: 'Finish-Span'
-    };
-
-    if (!this._fields.logs) this._fields.logs = [];
-    if (this._tracer.multiEvent) {
-      this._fields.logs[0] = log;
-    } else {
-      this._fields.logs.push(log);
     }
-    this._tracer.report(this._fields);
-    this._finished = true;
+
+    if (!this._fields.logs) this._fields.logs = []
+    if (this._tracer.multiEvent) {
+      this._fields.logs[0] = log
+    } else {
+      this._fields.logs.push(log)
+    }
+    this._tracer.report(this._fields)
+    this._finished = true
   }
 }
-exports.default = Span;
-module.exports = exports['default'];
