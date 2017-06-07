@@ -4,7 +4,7 @@
   "description": "Canonical OpenTracing for Javascript",
   "main": "./lib/index.js",
   "scripts": {
-    "lint": "standard | snazzy && flow",
+    "lint": "standard | snazzy",
     "fix": "standard --fix",
     "build": "babel src/ -d lib/",
     "prepublish": "yarn run build",
