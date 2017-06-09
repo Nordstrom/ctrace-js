@@ -1,6 +1,7 @@
 'use strict'
 
 const encoder = require('../lib/encoder.js')
+const os = require('os')
 require('should')
 
 describe('encoder', () => {
@@ -31,7 +32,7 @@ describe('encoder', () => {
       '{"traceId":"abc","spanId":"def","parentId":"ghi","operation":"op1",' +
       '"start":1489522409134,"duration":123,"tags":{"tag1":"val1","tag2":"val2"},' +
       '"logs":[{"timestamp":1489522409135,"event":"event1"}],' +
-      '"baggage":{"bag1":"val1","bag2":"val2"}}'
+      '"baggage":{"bag1":"val1","bag2":"val2"}}' + os.EOL
     )
   })
 })
