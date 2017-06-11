@@ -1,3 +1,4 @@
+const os = require('os')
 const stringify = JSON.stringify
 
 export default class Encoder {
@@ -30,6 +31,6 @@ export default class Encoder {
       baggage = `,"baggage":${stringify(sp.baggage)}`
     }
 
-    return `${prefix}${tags}${logs}${baggage}}`
+    return `${prefix}${tags}${logs}${baggage}}${os.EOL}`
   }
 }

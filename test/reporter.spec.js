@@ -2,6 +2,7 @@
 
 require('should')
 
+const os = require('os')
 const Reporter = require('../lib/reporter.js')
 const encoder = require('../lib/encoder.js')
 const Stream = require('./util/stream.js')
@@ -38,7 +39,7 @@ describe('reporter', () => {
       '"start":1489522409134,"duration":123,' +
       '"tags":{"tag1":"val1","tag2":"val2"},' +
       '"logs":[{"timestamp":1489522409134,"event":"Start-Span"},' +
-      '{"timestamp":1489522409135,"event":"Finish-Span"}]}'
+      '{"timestamp":1489522409135,"event":"Finish-Span"}]}' + os.EOL
     )
   })
 
