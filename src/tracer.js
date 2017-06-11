@@ -27,7 +27,7 @@ export default class Tracer {
   /**
    * Construct a new tracer.
    *
-   * @param {object} opts
+   * @param {object} options
    */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
@@ -59,24 +59,24 @@ export default class Tracer {
    * For example:
    *
    *     // Start a new (parentless) root Span:
-   *     var parent = Tracer.startSpan('DoWork');
+   *     let parent = tracer.startSpan('DoWork')
    *
    *     // Start a new (child) Span:
-   *     var child = Tracer.startSpan('Subroutine', {
-   *         childOf: parent.context(),
+   *     let child = tracer.startSpan('Subroutine', {
+   *         childOf: parent,
    *     });
    *
    * @param {string} name - the name of the operation.
-   * @param {object} [fields] - the fields to set on the newly created span.
-   * @param {SpanOptions} [fields.childOf] - a parent SpanContext (or Span,
+   * @param {object} [options] - the fields to set on the newly created span.
+   * @param {SpanOptions} [options.childOf] - a parent SpanContext (or Span,
    *        for convenience) that the newly-started span will be the child of
    *        (per REFERENCE_CHILD_OF). If specified, `fields.references` must
    *        be unspecified.
-   * @param {SpanTags} [fields.tags] - set of key-value pairs which will be set
+   * @param {SpanTags} [options.tags] - set of key-value pairs which will be set
    *        as tags on the newly created Span. Ownership of the object is
    *        passed to the created span for efficiency reasons (the caller
    *        should not modify this object after calling startSpan).
-   * @return {Span} - a new Span object.
+   * @return {Span} a new Span object.
    */
   startSpan (name, options = {}) {
     const now = Date.now() * 1000

@@ -12,7 +12,7 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
     "coveralls": "nyc --reporter=text-lcov mocha | coveralls",
     "bench": "node ./bench.js",
-    "docs": "documentation build src/** -f md -o API.md --config documentation.yml",
+    "docs": "documentation build src/** -f md -o API.md --shallow",
     "start": "node ./demo.js"
   },
   "author": "@andyday",
@@ -28,6 +28,7 @@
     "fast-json-parse": "^1.0.2",
     "flow-bin": "^0.47.0",
     "flow-remove-types": "^1.2.1",
+    "jsdoc-to-markdown": "^3.0.0",
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
     "pino": "^3.1.1",

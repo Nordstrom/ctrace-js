@@ -7,20 +7,23 @@ import opentracing from 'opentracing'
  * may have zero or more child Spans, which in turn may have children.
  */
 export default class Span extends opentracing.Span {
-  // ---------------------------------------------------------------------- //
-  // OpenTracing API methods
-  // ---------------------------------------------------------------------- //
-
+  /**
+   * Constructor for internal use only.  To start a span call {Tracer#startSpan}
+   */
   constructor (tracer, fields) {
     super()
     this._tracer = tracer
     this._fields = fields
   }
 
+  // ---------------------------------------------------------------------- //
+  // OpenTracing API methods
+  // ---------------------------------------------------------------------- //
+
   /**
    * Returns the SpanContext object associated with this Span.
    *
-   * @return {object} {traceId:...,spanId:...,baggage:...}
+   * @return {SpanContext}
    */
   context () {
     return this._fields.baggage ? {
@@ -118,7 +121,7 @@ export default class Span extends opentracing.Span {
    * may choose to ignore unrecognized / unhandle-able values (e.g. objects
    * with cyclic references, function objects).
    *
-   * @param {object} {[string]:any}
+   * @param {Object.<string,any>} keyValues
    * @return {Span} this
    */
   addTags (keyValues) {

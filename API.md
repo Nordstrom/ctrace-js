@@ -2,14 +2,11 @@
 
 ### Table of Contents
 
--   [Tracer](#tracer)
-    -   [constructor](#constructor)
-    -   [startSpan](#startspan)
-    -   [inject](#inject)
-    -   [extract](#extract)
+-   [SpanContext](#spancontext)
 -   [Span](#span)
+    -   [constructor](#constructor)
     -   [context](#context)
-    -   [tracer](#tracer-1)
+    -   [tracer](#tracer)
     -   [setOperationName](#setoperationname)
     -   [setBaggageItem](#setbaggageitem)
     -   [getBaggageItem](#getbaggageitem)
@@ -17,115 +14,21 @@
     -   [addTags](#addtags)
     -   [log](#log)
     -   [finish](#finish)
+-   [Tracer](#tracer-1)
+    -   [constructor](#constructor-1)
+    -   [startSpan](#startspan)
+    -   [inject](#inject)
+    -   [extract](#extract)
 
-## Tracer
+## SpanContext
 
-Tracer is the tracing entry-point.  It facilitates starting a new span and
-context propagation (ie. inject, extract).
+Type: [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
-**Parameters**
+**Properties**
 
--   `options`   (optional, default `{}`)
-
-### constructor
-
-Construct a new tracer.
-
-**Parameters**
-
--   `options`   (optional, default `{}`)
--   `opts` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
-
-### startSpan
-
-Starts and returns a new Span representing a logical unit of work.
-
-For example:
-
-    // Start a new (parentless) root Span:
-    var parent = Tracer.startSpan('DoWork');
-
-    // Start a new (child) Span:
-    var child = Tracer.startSpan('Subroutine', {
-        childOf: parent.context(),
-    });
-
-**Parameters**
-
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the operation.
--   `options`   (optional, default `{}`)
--   `fields` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** the fields to set on the newly created span.
-    -   `fields.childOf` **SpanOptions?** a parent SpanContext (or Span,
-               for convenience) that the newly-started span will be the child of
-               (per REFERENCE_CHILD_OF). If specified, `fields.references` must
-               be unspecified.
-    -   `fields.tags` **SpanTags?** set of key-value pairs which will be set
-               as tags on the newly created Span. Ownership of the object is
-               passed to the created span for efficiency reasons (the caller
-               should not modify this object after calling startSpan).
-
-Returns **[Span](#span)** a new Span object.
-
-### inject
-
-Injects the given SpanContext instance for cross-process propagation
-within `carrier`. The expected type of `carrier` depends on the value of
-\`format.
-
-OpenTracing defines a common set of `format` values (see
-FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
-an expected carrier type.
-
-Consider this pseudocode example:
-
-    var clientSpan = ...;
-    ...
-    // Inject clientSpan into a text carrier.
-    var headersCarrier = {};
-    Tracer.inject(clientSpan.context(), Tracer.FORMAT_HTTP_HEADERS, headersCarrier);
-    // Incorporate the textCarrier into the outbound HTTP request header
-    // map.
-    Object.assign(outboundHTTPReq.headers, headersCarrier);
-    // ... send the httpReq
-
-**Parameters**
-
--   `spanContext` **SpanContext** the SpanContext to inject into the
-            carrier object. As a convenience, a Span instance may be passed
-            in instead (in which case its .context() is used for the
-            inject()).
--   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
--   `carrier` **any** see the documentation for the chosen `format`
-            for a description of the carrier object.
-
-### extract
-
-Returns a SpanContext instance extracted from `carrier` in the given
-`format`.
-
-OpenTracing defines a common set of `format` values (see
-FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
-an expected carrier type.
-
-Consider this pseudocode example:
-
-    // Use the inbound HTTP request's headers as a text map carrier.
-    var headersCarrier = inboundHTTPReq.headers;
-    var wireCtx = Tracer.extract(Tracer.FORMAT_HTTP_HEADERS, headersCarrier);
-    var serverSpan = Tracer.startSpan('...', { childOf : wireCtx });
-
-**Parameters**
-
--   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
--   `carrier` **any** the type of the carrier object is determined by
-            the format.
-
-Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The extracted SpanContext, or null if no such SpanContext could
-        be found in `carrier`
-
-Returns **object.traceId** trace id
-
-Returns **object.spanId** span id
+-   `traceId` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** id of trace including multiple spans
+-   `spanId` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** id of span (start/stop event)
+-   `baggage` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** optional key/value map of tags that carry across spans in a single trace.
 
 ## Span
 
@@ -141,17 +44,26 @@ may have zero or more child Spans, which in turn may have children.
 -   `tracer`  
 -   `fields`  
 
+### constructor
+
+Constructor for internal use only.  To start a span call {Tracer#startSpan}
+
+**Parameters**
+
+-   `tracer`  
+-   `fields`  
+
 ### context
 
 Returns the SpanContext object associated with this Span.
 
-Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** {traceId:...,spanId:...,baggage:...}
+Returns **[SpanContext](#spancontext)**
 
 ### tracer
 
 Returns the Tracer object used to create this Span.
 
-Returns **[Tracer](#tracer)** 
+Returns **[Tracer](#tracer)**
 
 ### setOperationName
 
@@ -159,7 +71,7 @@ Sets the string name for the logical operation this span represents.
 
 **Parameters**
 
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 Returns **[Span](#span)** this
 
@@ -183,8 +95,8 @@ Span, and that can add up to a lot of network and cpu overhead.
 
 **Parameters**
 
--   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
 
 ### getBaggageItem
 
@@ -203,8 +115,8 @@ Adds a single tag to the span.  See `addTags()` for details.
 
 **Parameters**
 
--   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
--   `value` **any** 
+-   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `value` **any**
 
 Returns **[Span](#span)** this
 
@@ -225,8 +137,7 @@ with cyclic references, function objects).
 
 **Parameters**
 
--   `keyValues`  
--   `null` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** {[string]&#x3A;any}
+-   `keyValues` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), any>**
 
 Returns **[Span](#span)** this
 
@@ -275,3 +186,110 @@ otherwise leads to undefined behavior.
             values are supported for timestamps with sub-millisecond accuracy.
             If not specified, the current time (as defined by the
             implementation) will be used.
+
+## Tracer
+
+Tracer is the tracing entry-point.  It facilitates starting a new span and
+context propagation (ie. inject, extract).
+
+**Parameters**
+
+-   `options`   (optional, default `{}`)
+
+### constructor
+
+Construct a new tracer.
+
+**Parameters**
+
+-   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
+
+### startSpan
+
+Starts and returns a new Span representing a logical unit of work.
+
+For example:
+
+    // Start a new (parentless) root Span:
+    let parent = tracer.startSpan('DoWork')
+
+    // Start a new (child) Span:
+    let child = tracer.startSpan('Subroutine', {
+        childOf: parent,
+    });
+
+**Parameters**
+
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the operation.
+-   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** the fields to set on the newly created span. (optional, default `{}`)
+    -   `options.childOf` **SpanOptions?** a parent SpanContext (or Span,
+               for convenience) that the newly-started span will be the child of
+               (per REFERENCE_CHILD_OF). If specified, `fields.references` must
+               be unspecified.
+    -   `options.tags` **SpanTags?** set of key-value pairs which will be set
+               as tags on the newly created Span. Ownership of the object is
+               passed to the created span for efficiency reasons (the caller
+               should not modify this object after calling startSpan).
+
+Returns **[Span](#span)** a new Span object.
+
+### inject
+
+Injects the given SpanContext instance for cross-process propagation
+within `carrier`. The expected type of `carrier` depends on the value of
+\`format.
+
+OpenTracing defines a common set of `format` values (see
+FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
+an expected carrier type.
+
+Consider this pseudocode example:
+
+    var clientSpan = ...;
+    ...
+    // Inject clientSpan into a text carrier.
+    var headersCarrier = {};
+    Tracer.inject(clientSpan.context(), Tracer.FORMAT_HTTP_HEADERS, headersCarrier);
+    // Incorporate the textCarrier into the outbound HTTP request header
+    // map.
+    Object.assign(outboundHTTPReq.headers, headersCarrier);
+    // ... send the httpReq
+
+**Parameters**
+
+-   `spanContext` **[SpanContext](#spancontext)** the SpanContext to inject into the
+            carrier object. As a convenience, a Span instance may be passed
+            in instead (in which case its .context() is used for the
+            inject()).
+-   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
+-   `carrier` **any** see the documentation for the chosen `format`
+            for a description of the carrier object.
+
+### extract
+
+Returns a SpanContext instance extracted from `carrier` in the given
+`format`.
+
+OpenTracing defines a common set of `format` values (see
+FORMAT_TEXT_MAP, FORMAT_HTTP_HEADERS, and FORMAT_BINARY), and each has
+an expected carrier type.
+
+Consider this pseudocode example:
+
+    // Use the inbound HTTP request's headers as a text map carrier.
+    var headersCarrier = inboundHTTPReq.headers;
+    var wireCtx = Tracer.extract(Tracer.FORMAT_HTTP_HEADERS, headersCarrier);
+    var serverSpan = Tracer.startSpan('...', { childOf : wireCtx });
+
+**Parameters**
+
+-   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
+-   `carrier` **any** the type of the carrier object is determined by
+            the format.
+
+Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The extracted SpanContext, or null if no such SpanContext could
+        be found in `carrier`
+
+Returns **object.traceId** trace id
+
+Returns **object.spanId** span id
