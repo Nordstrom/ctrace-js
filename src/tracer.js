@@ -20,15 +20,8 @@ function genId () {
 }
 
 /**
- * Tracer is the entry-point between the instrumentation API and the tracing
- * implementation.
- *
- * The default object acts as a no-op implementation.
- *
- * Note to implementators: derived classes can choose to directly implement the
- * methods in the "OpenTracing API methods" section, or optionally the subset of
- * underscore-prefixed methods to pick up the argument checking and handling
- * automatically from the base class.
+ * Tracer is the tracing entry-point.  It facilitates starting a new span and
+ * context propagation (ie. inject, extract).
  */
 export default class Tracer {
   /**
@@ -200,9 +193,10 @@ export default class Tracer {
    * @param  {string} format - the format of the carrier.
    * @param  {any} carrier - the type of the carrier object is determined by
    *         the format.
-   * @return {SpanContext}
-   *         The extracted SpanContext, or null if no such SpanContext could
+   * @return {object} - The extracted SpanContext, or null if no such SpanContext could
    *         be found in `carrier`
+   * @return {object.traceId} - trace id
+   * @return {object.spanId} - span id
    */
   extract (format, carrier) {
     const propagation = this._propagation[format]

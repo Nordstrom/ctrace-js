@@ -1,13 +1,6 @@
 import tracer from '../'
 
-/**
- *
- * @param {Object} [opts]
- * @param {Function} [opts.operationNameBuilder]
- * @returns {Function}
- */
-// todo: allow tracer to be passed in as option
-export default function expressMiddleware (opts) {
+export default function express (opts) {
   opts = opts || {}
 
   return function handle (req, res, next) {

@@ -20,7 +20,7 @@ export default class Span extends opentracing.Span {
   /**
    * Returns the SpanContext object associated with this Span.
    *
-   * @return {SpanContext}
+   * @return {object} {traceId:...,spanId:...,baggage:...}
    */
   context () {
     return this._fields.baggage ? {
@@ -46,6 +46,7 @@ export default class Span extends opentracing.Span {
    * Sets the string name for the logical operation this span represents.
    *
    * @param {string} name
+   * @return {Span} this
    */
   setOperationName (name) {
     this._fields.operation = name
@@ -96,6 +97,7 @@ export default class Span extends opentracing.Span {
    *
    * @param {string} key
    * @param {any} value
+   * @return {Span} this
    */
   setTag (key, value) {
     this.addTags({ [key]: value })
@@ -116,7 +118,8 @@ export default class Span extends opentracing.Span {
    * may choose to ignore unrecognized / unhandle-able values (e.g. objects
    * with cyclic references, function objects).
    *
-   * @return {[type]} [description]
+   * @param {object} {[string]:any}
+   * @return {Span} this
    */
   addTags (keyValues) {
     const tags = this._fields.tags || {}
@@ -153,6 +156,7 @@ export default class Span extends opentracing.Span {
    *        timestamps with sub-millisecond accuracy can be represented. If
    *        not specified, the implementation is expected to use its notion
    *        of the current time of the call.
+   * @return {Span} this
    */
   log (keyValues, timestamp) {
     if (!timestamp) timestamp = keyValues.timestamp || Date.now()
