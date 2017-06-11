@@ -7,9 +7,9 @@ import opentracing from 'opentracing'
  * may have zero or more child Spans, which in turn may have children.
  */
 export default class Span extends opentracing.Span {
-  // /**
-  //  * Constructor for internal use only.  To start a span call {Tracer.startSpan}
-  //  */
+  /**
+   * Constructor for internal use only.  To start a span call {@link Tracer.startSpan}
+   */
   constructor (tracer, fields) {
     super()
     this._tracer = tracer

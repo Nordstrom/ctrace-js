@@ -11,6 +11,7 @@
     -   [startSpan](#startspan)
     -   [init](#init)
 -   [Span](#span)
+    -   [constructor](#constructor)
     -   [context](#context)
     -   [tracer](#tracer)
     -   [setOperationName](#setoperationname)
@@ -21,6 +22,7 @@
     -   [log](#log)
     -   [finish](#finish)
 -   [Tracer](#tracer-1)
+    -   [constructor](#constructor-1)
     -   [startSpan](#startspan-1)
     -   [inject](#inject-1)
     -   [extract](#extract-1)
@@ -99,6 +101,15 @@ Span represents a logical unit of work as part of a broader Trace. Examples
 of span might include remote procedure calls or a in-process function calls
 to sub-components. A Trace has a single, top-level "root" Span that in turn
 may have zero or more child Spans, which in turn may have children.
+
+**Parameters**
+
+-   `tracer`  
+-   `fields`  
+
+### constructor
+
+Constructor for internal use only.  To start a span call [Tracer.startSpan](Tracer.startSpan)
 
 **Parameters**
 
@@ -247,6 +258,17 @@ context propagation (ie. inject, extract).
 
 -   `options`   (optional, default `{}`)
 
+### constructor
+
+Construct a new tracer for internal use only.  Use [GlobalTracer.init](GlobalTracer.init) to set global trace options.
+
+**Parameters**
+
+-   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** options used to initialize tracer (optional, default `{}`)
+    -   `options.multiEvent` **bool?** true for multi-event mode; otherwise, single-event mode
+    -   `options.debug` **bool?** true for debug; otherwise, it is disabled
+    -   `options.propagators` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [Propagators](#propagators)>?** optional propagators
+
 ### startSpan
 
 Starts and returns a new Span representing a logical unit of work.
@@ -305,7 +327,7 @@ Consider this pseudocode example:
             in instead (in which case its .context() is used for the
             inject()).
 -   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
--   `carrier` **any** see the documentation for the chosen `format`
+-   `carrier` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** see the documentation for the chosen `format`
             for a description of the carrier object.
 
 ### extract
@@ -327,12 +349,8 @@ Consider this pseudocode example:
 **Parameters**
 
 -   `format` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the format of the carrier.
--   `carrier` **any** the type of the carrier object is determined by
+-   `carrier` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the type of the carrier object is determined by
             the format.
 
-Returns **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** The extracted SpanContext, or null if no such SpanContext could
+Returns **[SpanContext](#spancontext)** The extracted SpanContext, or undefined if no such SpanContext could
         be found in `carrier`
-
-Returns **object.traceId** trace id
-
-Returns **object.spanId** span id

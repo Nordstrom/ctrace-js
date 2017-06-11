@@ -24,14 +24,14 @@ function genId () {
  * context propagation (ie. inject, extract).
  */
 export default class Tracer {
-  // /**
-  //  * Construct a new tracer for internal use only.  Use tracer.init to set global trace options.
-  //  *
-  //  * @param {object} options - options used to initialize tracer
-  //  * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode
-  //  * @param {bool} [options.debug] - true for debug; otherwise, it is disabled
-  //  * @param {Object.<string, Propagators>} [options.propagators] - optional propagators
-  //  */
+  /**
+   * Construct a new tracer for internal use only.  Use {@link GlobalTracer.init} to set global trace options.
+   *
+   * @param {object} options - options used to initialize tracer
+   * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode
+   * @param {bool} [options.debug] - true for debug; otherwise, it is disabled
+   * @param {object.<string, Propagators>} [options.propagators] - optional propagators
+   */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
@@ -75,7 +75,7 @@ export default class Tracer {
    *        for convenience) that the newly-started span will be the child of
    *        (per REFERENCE_CHILD_OF). If specified, `fields.references` must
    *        be unspecified.
-   * @param {object.<string,object>} [options.tags] - set of key-value pairs which will be set
+   * @param {object.<string, object>} [options.tags] - set of key-value pairs which will be set
    *        as tags on the newly created Span. Ownership of the object is
    *        passed to the created span for efficiency reasons (the caller
    *        should not modify this object after calling startSpan).
@@ -168,7 +168,7 @@ export default class Tracer {
    *         in instead (in which case its .context() is used for the
    *         inject()).
    * @param  {string} format - the format of the carrier.
-   * @param  {any} carrier - see the documentation for the chosen `format`
+   * @param  {object} carrier - see the documentation for the chosen `format`
    *         for a description of the carrier object.
    */
   inject (spanContext, format, carrier) {
@@ -194,12 +194,10 @@ export default class Tracer {
    *     var serverSpan = Tracer.startSpan('...', { childOf : wireCtx });
    *
    * @param  {string} format - the format of the carrier.
-   * @param  {any} carrier - the type of the carrier object is determined by
+   * @param  {object} carrier - the type of the carrier object is determined by
    *         the format.
-   * @return {object} - The extracted SpanContext, or null if no such SpanContext could
+   * @return {SpanContext} - The extracted SpanContext, or undefined if no such SpanContext could
    *         be found in `carrier`
-   * @return {object.traceId} - trace id
-   * @return {object.spanId} - span id
    */
   extract (format, carrier) {
     const propagation = this._propagation[format]
