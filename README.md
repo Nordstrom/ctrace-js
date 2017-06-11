@@ -34,7 +34,7 @@ const tracer = require('ctrace-js')
 OR, initialize the global tracer with custom options as follows.
 
 ```js
-const tracer = require('ctrace')
+const tracer = require('ctrace-js')
 tracer.init({
   multiEvent: true,  // true for Multi-Event Mode; false for Single-Event Mode.  defaults to false.
   debug: true,       // true to enabling debugging.  defaults to false.
