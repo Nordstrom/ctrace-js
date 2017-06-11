@@ -140,8 +140,8 @@ describe('tracer', () => {
             {
               extract: (carrier) => {
                 if (carrier['TraceContext']) {
-                  let [traceId, spanId] = carrier['TraceContext'].split('|')
-                  return {traceId, spanId}
+                  let ctx = carrier['TraceContext'].split('|')
+                  return {traceId: ctx[0], spanId: ctx[1]}
                 }
               }
             }
