@@ -109,12 +109,12 @@ may have zero or more child Spans, which in turn may have children.
 
 ### constructor
 
-Constructor for internal use only.  To start a span call [Tracer.startSpan](Tracer.startSpan)
+Constructor for internal use only.  To start a span call [Tracer#startSpan](#tracerstartspan)
 
 **Parameters**
 
--   `tracer`  
--   `fields`  
+-   `tracer` **[Tracer](#tracer)** 
+-   `fields` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 ### context
 
@@ -260,7 +260,7 @@ context propagation (ie. inject, extract).
 
 ### constructor
 
-Construct a new tracer for internal use only.  Use [GlobalTracer.init](GlobalTracer.init) to set global trace options.
+Construct a new tracer for internal use only.  Use [GlobalTracer#init](#globaltracerinit) to set global trace options.
 
 **Parameters**
 
