@@ -5,7 +5,7 @@ const should = require('should')
 const tracer = require('../')
 const Stream = require('./util/stream.js')
 
-describe.only('tracer', () => {
+describe('tracer', () => {
   let stream, buf, timestamp
 
   beforeEach(() => {
