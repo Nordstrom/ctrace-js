@@ -3,8 +3,8 @@
 require('should')
 
 const os = require('os')
-const Reporter = require('../lib/reporter.js')
-const encoder = require('../lib/encoder.js')
+const Reporter = require('../src/reporter.js')
+const encoder = require('../src/encoder.js')
 const Stream = require('./util/stream.js')
 
 describe('reporter', () => {

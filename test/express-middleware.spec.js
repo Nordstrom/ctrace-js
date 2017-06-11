@@ -1,11 +1,9 @@
-'use strict'
+import './util/assertions'
+import should from 'should'
 
-require('./util/assertions')
-const should = require('should')
-
-const tracer = require('../')
-const Span = require('../lib/span.js')
-const Stream = require('./util/stream.js')
+import tracer from '../src'
+import Span from '../src/span'
+import Stream from './util/stream'
 
 const stringify = JSON.stringify
 
@@ -91,6 +89,7 @@ describe('express middleware', () => {
       })
 
       it('should start span and assign to property `span` of request', () => {
+        console.log(typeof incomingReq.traceContext.span)
         should.exist(incomingReq)
         incomingReq.should.have.property('traceContext').which.is.an.Object()
         incomingReq.traceContext.should.have.property('span').which.is.an.instanceOf(Span)

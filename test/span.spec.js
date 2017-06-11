@@ -2,7 +2,7 @@
 
 require('should')
 
-const tracer = require('../lib')
+const tracer = require('../src')
 const Stream = require('./util/stream.js')
 
 describe('span', () => {

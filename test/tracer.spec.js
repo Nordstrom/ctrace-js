@@ -2,7 +2,7 @@
 
 const should = require('should')
 
-const tracer = require('../')
+const tracer = require('../src')
 const Stream = require('./util/stream.js')
 
 describe('tracer', () => {

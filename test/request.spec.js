@@ -6,7 +6,7 @@ const http = require('http')
 const rp = require('request-promise')
 const request = require('request')
 const Stream = require('./util/stream.js')
-const tracer = require('../')
+const tracer = require('../src')
 const tr = tracer.request
 
 function createServer () {
