@@ -230,6 +230,6 @@ describe('request', () => {
   })
 
   it('should handle invalid request fn', () => {
-    (() => tr.trace(() => {})({})).should.throw('() => {} does not return a promise')
+    (() => tr.trace(() => {})({})).should.throw(/does not return a promise/)
   })
 })

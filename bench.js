@@ -1,13 +1,10 @@
-'use strict'
-
 const fs = require('fs')
 const opentracing = require('opentracing')
 const Benchmark = require('benchmark')
 const suite = new Benchmark.Suite()
 const pino = require('pino')
-const Tracer = require('./')
+const tracer = require('./')
 const logger = pino(fs.createWriteStream('dump-pino.json'))
-const tracer = opentracing.globalTracer()
 
 opentracing.initGlobalTracer(new Tracer({stream: fs.createWriteStream('dump.json')}))
 
