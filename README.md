@@ -102,12 +102,39 @@ app.post('/users', (req, res) => {
 ```
 
 ### Log Event
-The HTTP REST service might want to log the DB update as follows.
+Log events as follows.
 
 ```js
 app.post('/users', (req, res) => {
-  const span = req.ctrace.span
+  const span = req.span
   span.log({event: 'SaveUser', userId: 'u123'})
+  // ...
+})
+```
+
+### Log Errors
+Log errors and return visible trace context as follows.
+
+```js
+app.post('/users', (req, res) => {
+  const span = req.span
+  try {
+    // ...
+  } catch (err) {
+    span.log({
+      event: 'error',
+      'error.kind': 'Exception',
+      message: err.message,
+      stack: err.stack
+    })
+
+    let ctx = span.context()
+    res.status(500).json({
+      error: err.message,
+      traceId: ctx.traceId,
+      spanId: ctx.spanId
+    })
+  }
 })
 ```
 

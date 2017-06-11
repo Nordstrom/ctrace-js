@@ -18,7 +18,9 @@ export default function express (opts) {
         'http.url': fullUrl
       }
     })
-    req.ctrace = { span: span }
+    req.ctrace = { span: span }    // for forwards compatibility
+    req.traceContext = req.ctrace  // backwards compatibility
+    req.span = span
 
     res.on('finish', function () {
       if (res.statusCode >= 400) {
