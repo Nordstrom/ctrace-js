@@ -1,5 +1,5 @@
 # ctrace-js
-[![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
+[![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![NPM Version][npm-img]][npm] [![OpenTracing 1.0 Enabled][ot-img]][ot-url]
 
 [Canonical OpenTracing](https://github.com/Nordstrom/ctrace-js) for Javascript
 
@@ -157,5 +157,7 @@ For API documentation go [here](API.md).
 [ci]: https://travis-ci.org/Nordstrom/ctrace-js
 [cov-img]: https://coveralls.io/repos/github/Nordstrom/ctrace-js/badge.svg?branch=new
 [cov]: https://coveralls.io/github/Nordstrom/ctrace-js?branch=new
+[npm-img]: https://img.shields.io/npm/v/ctrace-js.svg
+[npm]: https://www.npmjs.com/package/ctrace-js
 [ot-img]: https://img.shields.io/badge/OpenTracing--1.0-enabled-blue.svg
 [ot-url]: http://opentracing.io
