@@ -25,7 +25,7 @@ function genId () {
  */
 export default class Tracer {
   /**
-   * Construct a new tracer for internal use only.  Use {@link GlobalTracer.init} to set global trace options.
+   * Construct a new tracer for internal use only.  Use {@link GlobalTracer#init} to set global trace options.
    *
    * @param {object} options - options used to initialize tracer
    * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode

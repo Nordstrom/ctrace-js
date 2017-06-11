@@ -8,7 +8,10 @@ import opentracing from 'opentracing'
  */
 export default class Span extends opentracing.Span {
   /**
-   * Constructor for internal use only.  To start a span call {@link Tracer.startSpan}
+   * Constructor for internal use only.  To start a span call {@link Tracer#startSpan}
+   *
+   * @param {Tracer} tracer
+   * @param {object} fields
    */
   constructor (tracer, fields) {
     super()
