@@ -50,6 +50,10 @@
       "afterEach"
     ]
   },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": false
+  },
   "dependencies": {
     "opentracing": "^0.13.0"
   }
