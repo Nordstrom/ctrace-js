@@ -25,19 +25,48 @@ $ npm install ctrace --save
 Add instrumentation to the operations you want to track. This is composed primarily of using "spans" around operations of interest and adding log statements to capture useful data relevant to those operations.
 
 ### Initialize Global Tracer
-First, initialize global tracer as follows.
+First, initialize the global tracer as follows.
 
 ```js
 const tracer = require('ctrace')
 ```
 
+OR, initialize the global tracer with custom options as follows.
+
+```js
+const tracer = require('ctrace')
+tracer.init({
+  multiEvent: true,  // true for Multi-Event Mode; false for Single-Event Mode.  defaults to false.
+  debug: true,       // true to enabling debugging.  defaults to false.
+  propagators: {     // custom propagators mapped to format type
+    [tracer.FORMAT_HTTP_HEADERS]: [
+      {
+        extract: (carrier) => {
+          if (carrier['x-correlation-id']) {
+            return {
+              traceId: carrier['x-correlation-id'],
+              spanId: carrier['x-correlation-id']
+            }
+          }
+        }
+      }
+    ]
+  }
+})
+```
+
 ### Client HTTP Requests
-To trace client HTTP requests you can use the `request` wrapper for [request-promise](https://www.npmjs.com/package/request-promise) or [request](https://www.npmjs.com/package/request).  To trace a request using [request-promise](https://www.npmjs.com/package/request-promise) make sure it is
-installed and then initialize the `request` wrapper in a main module follows.
+To trace client HTTP requests you can use the `request` wrapper for [request-promise](https://www.npmjs.com/package/request-promise) or [request](https://www.npmjs.com/package/request).  To trace a request using [request-promise](https://www.npmjs.com/package/request-promise) do the following.
 
 ```js
 const request = require('ctrace').request
-request.init(require('request-promise'))
+```
+
+OR, to trace using [request](https://www.npmjs.com/package/request) do the following.
+
+```js
+const request = require('ctrace').request
+request.init(require('request'))
 ```
 
 You can then send HTTP(S) requests in this or other modules as follows.
