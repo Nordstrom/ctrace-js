@@ -7,9 +7,9 @@ import opentracing from 'opentracing'
  * may have zero or more child Spans, which in turn may have children.
  */
 export default class Span extends opentracing.Span {
-  /**
-   * Constructor for internal use only.  To start a span call {Tracer#startSpan}
-   */
+  // /**
+  //  * Constructor for internal use only.  To start a span call {Tracer.startSpan}
+  //  */
   constructor (tracer, fields) {
     super()
     this._tracer = tracer
@@ -99,7 +99,7 @@ export default class Span extends opentracing.Span {
    * Adds a single tag to the span.  See `addTags()` for details.
    *
    * @param {string} key
-   * @param {any} value
+   * @param {object} value
    * @return {Span} this
    */
   setTag (key, value) {
@@ -121,7 +121,7 @@ export default class Span extends opentracing.Span {
    * may choose to ignore unrecognized / unhandle-able values (e.g. objects
    * with cyclic references, function objects).
    *
-   * @param {Object.<string,any>} keyValues
+   * @param {object.<string, object>} keyValues
    * @return {Span} this
    */
   addTags (keyValues) {
@@ -149,7 +149,7 @@ export default class Span extends opentracing.Span {
    *         "error.description": someError.description(),
    *     }, someError.timestampMillis());
    *
-   * @param {object} keyValuePairs
+   * @param {object.<string, object>} keyValues
    *        An object mapping string keys to arbitrary value types. All
    *        Tracer implementations should support bool, string, and numeric
    *        value types, and some may also support Object values.

@@ -3,8 +3,14 @@
 ### Table of Contents
 
 -   [SpanContext](#spancontext)
+-   [Propagators](#propagators)
+-   [Propagator](#propagator)
+    -   [extract](#extract)
+    -   [inject](#inject)
+-   [GlobalTracer](#globaltracer)
+    -   [startSpan](#startspan)
+    -   [init](#init)
 -   [Span](#span)
-    -   [constructor](#constructor)
     -   [context](#context)
     -   [tracer](#tracer)
     -   [setOperationName](#setoperationname)
@@ -15,12 +21,13 @@
     -   [log](#log)
     -   [finish](#finish)
 -   [Tracer](#tracer-1)
-    -   [constructor](#constructor-1)
-    -   [startSpan](#startspan)
-    -   [inject](#inject)
-    -   [extract](#extract)
+    -   [startSpan](#startspan-1)
+    -   [inject](#inject-1)
+    -   [extract](#extract-1)
 
 ## SpanContext
+
+An object containing the context used to propagate from span to span
 
 Type: [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)
 
@@ -29,6 +36,60 @@ Type: [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
 -   `traceId` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** id of trace including multiple spans
 -   `spanId` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** id of span (start/stop event)
 -   `baggage` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)>** optional key/value map of tags that carry across spans in a single trace.
+
+## Propagators
+
+Type: [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Propagator](#propagator)>
+
+## Propagator
+
+Interface for custom context propagation.  If extract or inject methods are present they
+will be used in the propagation chain.
+
+### extract
+
+Extract span context from a given carrier.
+
+**Parameters**
+
+-   `carrier` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+Returns **[SpanContext](#spancontext)** 
+
+### inject
+
+Inject span context into a given carrier.
+
+**Parameters**
+
+-   `spanContext` **[SpanContext](#spancontext)** 
+-   `carrier` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
+
+## GlobalTracer
+
+Global tracer singleton.  This is accessed as follows.
+
+    const tracer = require('ctrace')
+
+### startSpan
+
+Singleton wrapper for [Tracer#startSpan](#tracerstartspan)
+
+**Parameters**
+
+-   `name`  
+-   `context`  
+
+### init
+
+Used to initialize global tracer singleton
+
+**Parameters**
+
+-   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** options used to initialize tracer
+    -   `options.multiEvent` **bool?** true for multi-event mode; otherwise, single-event mode
+    -   `options.debug` **bool?** true for debug; otherwise, it is disabled
+    -   `options.propagators` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [Propagators](#propagators)>?** optional propagators
 
 ## Span
 
@@ -44,26 +105,17 @@ may have zero or more child Spans, which in turn may have children.
 -   `tracer`  
 -   `fields`  
 
-### constructor
-
-Constructor for internal use only.  To start a span call {Tracer#startSpan}
-
-**Parameters**
-
--   `tracer`  
--   `fields`  
-
 ### context
 
 Returns the SpanContext object associated with this Span.
 
-Returns **[SpanContext](#spancontext)**
+Returns **[SpanContext](#spancontext)** 
 
 ### tracer
 
 Returns the Tracer object used to create this Span.
 
-Returns **[Tracer](#tracer)**
+Returns **[Tracer](#tracer)** 
 
 ### setOperationName
 
@@ -71,7 +123,7 @@ Sets the string name for the logical operation this span represents.
 
 **Parameters**
 
--   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **[Span](#span)** this
 
@@ -95,8 +147,8 @@ Span, and that can add up to a lot of network and cpu overhead.
 
 **Parameters**
 
--   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
--   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
+-   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `value` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 ### getBaggageItem
 
@@ -115,8 +167,8 @@ Adds a single tag to the span.  See `addTags()` for details.
 
 **Parameters**
 
--   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)**
--   `value` **any**
+-   `key` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
+-   `value` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** 
 
 Returns **[Span](#span)** this
 
@@ -137,7 +189,7 @@ with cyclic references, function objects).
 
 **Parameters**
 
--   `keyValues` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), any>**
+-   `keyValues` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)>** 
 
 Returns **[Span](#span)** this
 
@@ -160,15 +212,14 @@ For example:
 
 **Parameters**
 
--   `keyValues`  
+-   `keyValues` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)>** An object mapping string keys to arbitrary value types. All
+           Tracer implementations should support bool, string, and numeric
+           value types, and some may also support Object values.
 -   `timestamp` **[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number)** An optional parameter specifying the timestamp in milliseconds
            since the Unix epoch. Fractional values are allowed so that
            timestamps with sub-millisecond accuracy can be represented. If
            not specified, the implementation is expected to use its notion
            of the current time of the call.
--   `keyValuePairs` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** An object mapping string keys to arbitrary value types. All
-           Tracer implementations should support bool, string, and numeric
-           value types, and some may also support Object values.
 
 Returns **[Span](#span)** this
 
@@ -196,14 +247,6 @@ context propagation (ie. inject, extract).
 
 -   `options`   (optional, default `{}`)
 
-### constructor
-
-Construct a new tracer.
-
-**Parameters**
-
--   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)**  (optional, default `{}`)
-
 ### startSpan
 
 Starts and returns a new Span representing a logical unit of work.
@@ -222,11 +265,11 @@ For example:
 
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the operation.
 -   `options` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)?** the fields to set on the newly created span. (optional, default `{}`)
-    -   `options.childOf` **SpanOptions?** a parent SpanContext (or Span,
+    -   `options.childOf` **([Span](#span) \| [SpanContext](#spancontext))?** a parent SpanContext (or Span,
                for convenience) that the newly-started span will be the child of
                (per REFERENCE_CHILD_OF). If specified, `fields.references` must
                be unspecified.
-    -   `options.tags` **SpanTags?** set of key-value pairs which will be set
+    -   `options.tags` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)>?** set of key-value pairs which will be set
                as tags on the newly created Span. Ownership of the object is
                passed to the created span for efficiency reasons (the caller
                should not modify this object after calling startSpan).

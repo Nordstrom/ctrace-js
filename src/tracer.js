@@ -24,11 +24,14 @@ function genId () {
  * context propagation (ie. inject, extract).
  */
 export default class Tracer {
-  /**
-   * Construct a new tracer.
-   *
-   * @param {object} options
-   */
+  // /**
+  //  * Construct a new tracer for internal use only.  Use tracer.init to set global trace options.
+  //  *
+  //  * @param {object} options - options used to initialize tracer
+  //  * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode
+  //  * @param {bool} [options.debug] - true for debug; otherwise, it is disabled
+  //  * @param {Object.<string, Propagators>} [options.propagators] - optional propagators
+  //  */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(Encoder, options.stream)
     this.multiEvent = options.multiEvent || false
@@ -68,11 +71,11 @@ export default class Tracer {
    *
    * @param {string} name - the name of the operation.
    * @param {object} [options] - the fields to set on the newly created span.
-   * @param {SpanOptions} [options.childOf] - a parent SpanContext (or Span,
+   * @param {Span|SpanContext} [options.childOf] - a parent SpanContext (or Span,
    *        for convenience) that the newly-started span will be the child of
    *        (per REFERENCE_CHILD_OF). If specified, `fields.references` must
    *        be unspecified.
-   * @param {SpanTags} [options.tags] - set of key-value pairs which will be set
+   * @param {object.<string,object>} [options.tags] - set of key-value pairs which will be set
    *        as tags on the newly created Span. Ownership of the object is
    *        passed to the created span for efficiency reasons (the caller
    *        should not modify this object after calling startSpan).
