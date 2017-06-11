@@ -25,12 +25,12 @@ export default class TextPropagator {
       baggage[key.substring(this.baggagePrefix.length)] = this.decodeValue(carrier[key])
     }
     if (baggage) ctx.baggage = baggage
-    return ctx
+    if (ctx.traceId && ctx.spanId) return ctx
   }
 
   inject (spanContext, carrier) {
-    carrier[this.traceIdKey] = spanContext.traceId
-    carrier[this.spanIdKey] = spanContext.spanId
+    if (spanContext.traceId) carrier[this.traceIdKey] = spanContext.traceId
+    if (spanContext.spanId) carrier[this.spanIdKey] = spanContext.spanId
 
     const baggage = spanContext.baggage
     if (!baggage) return

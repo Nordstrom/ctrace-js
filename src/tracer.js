@@ -42,7 +42,7 @@ export default class Tracer {
     this.debug = options.debug || false
     this._propagation = {}
 
-    if (!options._replacePropagators) {
+    if (!options.replacePropagators) {
       this._propagation[FORMAT_HTTP_HEADERS] = [new TextPropagator()]
       this._propagation[FORMAT_TEXT_MAP] = [new TextPropagator()]
     }
@@ -51,11 +51,7 @@ export default class Tracer {
     if (props) {
       for (let key of Object.keys(props)) {
         let list = this._propagation[key]
-        if (!list) {
-          list = []
-          this._propagation[key] = list
-        }
-        list.concat(props[key])
+        this._propagation[key] = (list || []).concat(props[key])
       }
     }
   }
@@ -182,7 +178,7 @@ export default class Tracer {
   inject (spanContext, format, carrier) {
     const propagation = this._propagation[format]
     for (let prop of propagation) {
-      prop.inject(spanContext, carrier)
+      prop.inject && prop.inject(spanContext, carrier)
     }
   }
 
@@ -211,7 +207,7 @@ export default class Tracer {
   extract (format, carrier) {
     const propagation = this._propagation[format]
     for (let prop of propagation) {
-      let ctx = prop.extract(carrier)
+      let ctx = prop.extract && prop.extract(carrier)
       if (ctx) return ctx
     }
     return undefined

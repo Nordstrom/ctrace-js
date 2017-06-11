@@ -25,7 +25,7 @@ export default function expressMiddleware (opts) {
         'http.url': fullUrl
       }
     })
-    req.traceContext = { span: span }
+    req.ctrace = { span: span }
 
     res.on('finish', function () {
       if (res.statusCode >= 400) {
