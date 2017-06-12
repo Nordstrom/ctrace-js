@@ -211,4 +211,13 @@ export default class Tracer {
   report (fields) {
     return this._reporter.report(fields)
   }
+
+  static genId () {
+    const buf = rb(8)
+    let i = 0
+    return bth[buf[i++]] + bth[buf[i++]] +
+      bth[buf[i++]] + bth[buf[i++]] +
+      bth[buf[i++]] + bth[buf[i++]] +
+      bth[buf[i++]] + bth[buf[i++]]
+  }
 }
