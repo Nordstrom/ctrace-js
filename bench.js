@@ -1,15 +1,12 @@
-'use strict'
-
 const fs = require('fs')
-const opentracing = require('opentracing')
 const Benchmark = require('benchmark')
 const suite = new Benchmark.Suite()
 const pino = require('pino')
-const Tracer = require('./')
+const genId = require('./lib/tracer.js').genId
+const tracer = require('./lib')
 const logger = pino(fs.createWriteStream('dump-pino.json'))
-const tracer = opentracing.globalTracer()
 
-opentracing.initGlobalTracer(new Tracer({stream: fs.createWriteStream('dump.json')}))
+tracer.init({stream: fs.createWriteStream('dump.json')})
 
 suite.add('parent-child-log', () => {
   const span = tracer.startSpan('parent', {
@@ -83,7 +80,7 @@ suite.add('parent-child', () => {
 })
 
 suite.add('pino-parent-child-log', () => {
-  const traceId = Tracer.genId()
+  const traceId = genId()
   logger.info({
     traceId: traceId,
     spanId: traceId,
@@ -161,7 +158,7 @@ suite.add('pino-parent-child-log', () => {
 })
 
 suite.add('pino-parent', () => {
-  const traceId = Tracer.genId()
+  const traceId = genId()
   logger.info({
     traceId: traceId,
     spanId: traceId,
@@ -194,7 +191,7 @@ suite.add('pino-parent', () => {
 })
 
 suite.add('pino-parent-child', () => {
-  const traceId = Tracer.genId()
+  const traceId = genId()
   logger.info({
     traceId: traceId,
     spanId: traceId,

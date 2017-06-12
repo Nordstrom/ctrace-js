@@ -2,7 +2,7 @@
 
 require('should')
 
-const tracer = require('../')
+const tracer = require('../src')
 const Stream = require('./util/stream.js')
 
 describe('span', () => {
@@ -22,11 +22,14 @@ describe('span', () => {
     })
 
     it('should return tracer', () => {
-      JSON.stringify(parent.tracer()).should.match(/_propagation/)
+      parent.tracer().should.equal(tracer._tracer)
     })
 
     it('should return context', () => {
-      parent.context().should.equal(parent._fields)
+      parent.context().should.match({
+        traceId: parent._fields.traceId,
+        spanId: parent._fields.spanId
+      })
     })
 
     it('should set operation name', () => {

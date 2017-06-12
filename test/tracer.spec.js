@@ -1,9 +1,8 @@
 'use strict'
 
-require('should')
+const should = require('should')
 
-const opentracing = require('opentracing')
-const tracer = require('../')
+const tracer = require('../src')
 const Stream = require('./util/stream.js')
 
 describe('tracer', () => {
@@ -34,14 +33,12 @@ describe('tracer', () => {
       span._tracer.should.not.be.empty()
     })
 
-    it('should start originating span with baggage and tags', () => {
+    it('should start originating span with tags', () => {
       let span = tracer.startSpan('originating', {
-        tags: {tag1: 'val1'},
-        baggage: {bag1: 'val2'}
+        tags: {tag1: 'val1'}
       })
       let fields = span._fields
       fields.tags.tag1.should.equal('val1')
-      fields.baggage.bag1.should.equal('val2')
     })
 
     it('should not output on start span', () => {
@@ -59,7 +56,7 @@ describe('tracer', () => {
           'bag-n2': 'val2'
         }
       }
-      tracer.inject(ctx, opentracing.FORMAT_HTTP_HEADERS, headers)
+      tracer.inject(ctx, tracer.FORMAT_HTTP_HEADERS, headers)
       headers.should.eql({
         'ct-trace-id': 'abc',
         'ct-span-id': 'def',
@@ -78,7 +75,7 @@ describe('tracer', () => {
           'bag-n2': 'val2'
         }
       }
-      tracer.inject(ctx, opentracing.FORMAT_TEXT_MAP, textMap)
+      tracer.inject(ctx, tracer.FORMAT_TEXT_MAP, textMap)
       textMap.should.eql({
         'ct-trace-id': 'abc',
         'ct-span-id': 'def',
@@ -94,7 +91,7 @@ describe('tracer', () => {
         'ct-bag-bag1': 'val1',
         'ct-bag-bag-n2': 'val2'
       }
-      const ctx = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, headers)
+      const ctx = tracer.extract(tracer.FORMAT_HTTP_HEADERS, headers)
       ctx.should.eql({
         traceId: 'abc',
         spanId: 'def',
@@ -112,7 +109,7 @@ describe('tracer', () => {
         'ct-bag-bag1': 'val1',
         'ct-bag-bag-n2': 'val2'
       }
-      const ctx = tracer.extract(opentracing.FORMAT_TEXT_MAP, textMap)
+      const ctx = tracer.extract(tracer.FORMAT_TEXT_MAP, textMap)
       ctx.should.eql({
         traceId: 'abc',
         spanId: 'def',
@@ -120,6 +117,91 @@ describe('tracer', () => {
           bag1: 'val1',
           'bag-n2': 'val2'
         }
+      })
+    })
+  })
+
+  describe('with custom propagators', () => {
+    beforeEach(() => {
+      tracer.init({
+        stream,
+        propagators: {
+          [tracer.FORMAT_HTTP_HEADERS]: [
+            {
+              extract: (carrier) => {
+                if (carrier['x-correlation-id']) {
+                  return {
+                    traceId: carrier['x-correlation-id'],
+                    spanId: carrier['x-correlation-id']
+                  }
+                }
+              }
+            },
+            {
+              extract: (carrier) => {
+                if (carrier['TraceContext']) {
+                  let ctx = carrier['TraceContext'].split('|')
+                  return {traceId: ctx[0], spanId: ctx[1]}
+                }
+              }
+            }
+          ],
+          'fmt-custom': [
+            {
+              inject: (spanContext, carrier) => {
+                carrier['custom-span-id'] = spanContext.spanId
+                carrier['custom-trace-id'] = spanContext.traceId
+              }
+            },
+            {
+              inject: (spanContext, carrier) => {
+                carrier['trace-context'] = `${spanContext.traceId}-${spanContext.spanId}`
+              }
+            }
+          ]
+        }
+      })
+    })
+
+    it('should extract custom', () => {
+      const headers = {'x-correlation-id': 'abcdef', 'ct-trace-id': 'xyz'}
+      let ctx = tracer.extract(tracer.FORMAT_HTTP_HEADERS, headers)
+      ctx.should.eql({
+        traceId: 'abcdef',
+        spanId: 'abcdef'
+      })
+    })
+
+    it('should respect propagation order', () => {
+      const headers = {'x-correlation-id': 'abcdef', 'ct-trace-id': 'xyz', 'ct-span-id': 'abc'}
+      let ctx = tracer.extract(tracer.FORMAT_HTTP_HEADERS, headers)
+      ctx.should.eql({
+        traceId: 'xyz',
+        spanId: 'abc'
+      })
+    })
+
+    it('should handle undefined extractor gracefully', () => {
+      const headers = {'x-correlation-id': 'abcdef', 'ct-trace-id': 'xyz', 'ct-span-id': 'abc'}
+      let ctx = tracer.extract('fmt-custom', headers)
+      should(ctx).be.undefined()
+    })
+
+    it('should handle undefined injector gracefully', () => {
+      const ctx = {}
+      const headers = {}
+      tracer.inject(ctx, tracer.FORMAT_HTTP_HEADERS, headers)
+      headers.should.eql({})
+    })
+
+    it('should inject custom', () => {
+      const ctx = {traceId: 'abc', spanId: 'def'}
+      const headers = {}
+      tracer.inject(ctx, 'fmt-custom', headers)
+      headers.should.eql({
+        'custom-trace-id': 'abc',
+        'custom-span-id': 'def',
+        'trace-context': 'abc-def'
       })
     })
   })

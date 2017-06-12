@@ -1,17 +1,15 @@
-'use strict'
-
 const os = require('os')
 const stringify = JSON.stringify
 
-class Encoder {
-  encode (sp) {
+export default class Encoder {
+  static encode (sp) {
     let prefix
 
-    if (sp.parentId && sp.duration >= 0) {
+    if (sp.parentId && sp.duration != null) {
       prefix = `{"traceId":"${sp.traceId}","spanId":"${sp.spanId}","parentId":"${sp.parentId}","operation":"${sp.operation}","start":${sp.start},"duration":${sp.duration}`
     } else if (sp.parentId) {
       prefix = `{"traceId":"${sp.traceId}","spanId":"${sp.spanId}","parentId":"${sp.parentId}","operation":"${sp.operation}","start":${sp.start}`
-    } else if (sp.duration >= 0) {
+    } else if (sp.duration != null) {
       prefix = `{"traceId":"${sp.traceId}","spanId":"${sp.spanId}","operation":"${sp.operation}","start":${sp.start},"duration":${sp.duration}`
     } else {
       prefix = `{"traceId":"${sp.traceId}","spanId":"${sp.spanId}","operation":"${sp.operation}","start":${sp.start}`
@@ -36,5 +34,3 @@ class Encoder {
     return `${prefix}${tags}${logs}${baggage}}${os.EOL}`
   }
 }
-
-module.exports = new Encoder()

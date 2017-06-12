@@ -1,8 +1,6 @@
-'use strict'
-
-const encoder = require('../lib/encoder.js')
-const os = require('os')
-require('should')
+import encoder from '../src/encoder'
+import os from 'os'
+import 'should'
 
 describe('encoder', () => {
   it('should encode full span', () => {

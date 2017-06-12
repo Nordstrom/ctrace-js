@@ -1,6 +1,4 @@
-'use strict'
-
-const opentracing = require('opentracing')
+import opentracing from 'opentracing'
 
 /**
  * Span represents a logical unit of work as part of a broader Trace. Examples
@@ -8,7 +6,19 @@ const opentracing = require('opentracing')
  * to sub-components. A Trace has a single, top-level "root" Span that in turn
  * may have zero or more child Spans, which in turn may have children.
  */
-class Span extends opentracing.Span {
+export default class Span extends opentracing.Span {
+  /**
+   * Constructor for internal use only.  To start a span call {@link Tracer#startSpan}
+   *
+   * @param {Tracer} tracer
+   * @param {object} fields
+   */
+  constructor (tracer, fields) {
+    super()
+    this._tracer = tracer
+    this._fields = fields
+  }
+
   // ---------------------------------------------------------------------- //
   // OpenTracing API methods
   // ---------------------------------------------------------------------- //
@@ -19,7 +29,14 @@ class Span extends opentracing.Span {
    * @return {SpanContext}
    */
   context () {
-    return this._fields
+    return this._fields.baggage ? {
+      traceId: this._fields.traceId,
+      spanId: this._fields.spanId,
+      baggage: this._fields.baggage
+    } : {
+      traceId: this._fields.traceId,
+      spanId: this._fields.spanId
+    }
   }
 
   /**
@@ -35,6 +52,7 @@ class Span extends opentracing.Span {
    * Sets the string name for the logical operation this span represents.
    *
    * @param {string} name
+   * @return {Span} this
    */
   setOperationName (name) {
     this._fields.operation = name
@@ -84,7 +102,8 @@ class Span extends opentracing.Span {
    * Adds a single tag to the span.  See `addTags()` for details.
    *
    * @param {string} key
-   * @param {any} value
+   * @param {object} value
+   * @return {Span} this
    */
   setTag (key, value) {
     this.addTags({ [key]: value })
@@ -105,12 +124,13 @@ class Span extends opentracing.Span {
    * may choose to ignore unrecognized / unhandle-able values (e.g. objects
    * with cyclic references, function objects).
    *
-   * @return {[type]} [description]
+   * @param {object.<string, object>} keyValues
+   * @return {Span} this
    */
   addTags (keyValues) {
     const tags = this._fields.tags || {}
-    for (let key in keyValues) {
-      if (keyValues.hasOwnProperty(key)) tags[key] = keyValues[key]
+    for (let key of Object.keys(keyValues)) {
+      tags[key] = keyValues[key]
     }
     this._fields.tags = tags
     return this
@@ -132,7 +152,7 @@ class Span extends opentracing.Span {
    *         "error.description": someError.description(),
    *     }, someError.timestampMillis());
    *
-   * @param {object} keyValuePairs
+   * @param {object.<string, object>} keyValues
    *        An object mapping string keys to arbitrary value types. All
    *        Tracer implementations should support bool, string, and numeric
    *        value types, and some may also support Object values.
@@ -142,14 +162,16 @@ class Span extends opentracing.Span {
    *        timestamps with sub-millisecond accuracy can be represented. If
    *        not specified, the implementation is expected to use its notion
    *        of the current time of the call.
+   * @return {Span} this
    */
   log (keyValues, timestamp) {
-    if (!keyValues.timestamp) keyValues.timestamp = timestamp || Date.now()
-    keyValues.timestamp *= 1000
+    if (!timestamp) timestamp = keyValues.timestamp || Date.now()
+    timestamp *= 1000
+    keyValues.timestamp = timestamp
     if (!this._fields.logs) this._fields.logs = []
-    if (this._tracer._multiEvent) {
+    if (this._tracer.multiEvent) {
       this._fields.logs[0] = keyValues
-      this._tracer._reporter.report(this._fields)
+      this._tracer.report(this._fields)
     } else {
       this._fields.logs.push(keyValues)
     }
@@ -179,14 +201,13 @@ class Span extends opentracing.Span {
       event: 'Finish-Span'
     }
 
-    if (this._tracer._multiEvent) {
+    if (!this._fields.logs) this._fields.logs = []
+    if (this._tracer.multiEvent) {
       this._fields.logs[0] = log
     } else {
       this._fields.logs.push(log)
     }
-    this._tracer._reporter.report(this._fields)
+    this._tracer.report(this._fields)
     this._finished = true
   }
 }
-
-module.exports = Span

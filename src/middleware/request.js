@@ -1,12 +1,8 @@
-'use strict'
+import {parse as urlParse} from 'url'
+import 'opentracing'
+import tracer from '../'
 
-const urlParse = require('url').parse
-const opentracing = require('opentracing')
-const tracer = opentracing.globalTracer()
-
-const _global = {
-  request: require('request-promise')
-}
+const _global = {}
 
 function handleResponse (span, status, err, msg) {
   if (err || status >= 300) {
@@ -54,12 +50,12 @@ function sendWithPromise (span, request, options) {
     })
 }
 
-function initGlobal (request, config) {
+function init (request, config) {
   _global.request = request
   _global.config = config
 }
 
-function tracedRequestFn (request, config) {
+function trace (request, config) {
   return function tracedRequest (options, cb) {
     if (!request) request = _global.request
     if (!config) config = _global.config
@@ -99,7 +95,7 @@ function tracedRequestFn (request, config) {
 
     if (!options.headers) options.headers = {}
 
-    tracer.inject(span.context(), opentracing.FORMAT_HTTP_HEADERS, options.headers)
+    tracer.inject(span.context(), tracer.FORMAT_HTTP_HEADERS, options.headers)
 
     if (cb && (typeof cb) === 'function') {
       return sendWithCb(span, request, options, cb)
@@ -109,6 +105,8 @@ function tracedRequestFn (request, config) {
   }
 }
 
-module.exports = tracedRequestFn()
-module.exports.trace = tracedRequestFn
-module.exports.init = initGlobal
+const t = trace()
+t.init = init
+t.trace = trace
+
+export default t
