@@ -2,7 +2,7 @@ const fs = require('fs')
 const Benchmark = require('benchmark')
 const suite = new Benchmark.Suite()
 const pino = require('pino')
-const genId = require('./lib/Tracer').genId
+const genId = require('./lib/tracer.js').genId
 const tracer = require('./lib')
 const logger = pino(fs.createWriteStream('dump-pino.json'))
 
