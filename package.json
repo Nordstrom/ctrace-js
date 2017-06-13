@@ -3,7 +3,6 @@
   "version": "0.4.0",
   "description": "Canonical OpenTracing for Javascript",
   "main": "./lib/index.js",
-  "files": "./lib",
   "scripts": {
     "lint": "standard | snazzy",
     "fix": "standard --fix",
