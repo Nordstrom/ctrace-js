@@ -33,8 +33,6 @@
     "mocha": "^3.2.0",
     "nyc": "^10.1.2",
     "pino": "^3.1.1",
-    "request": "^2.79.0",
-    "request-promise": "^4.1.1",
     "should": "^11.1.2",
     "snazzy": "^5.0.0",
     "split2": "^2.1.1",
@@ -55,6 +53,7 @@
     "instrument": false
   },
   "dependencies": {
-    "opentracing": "^0.13.0"
+    "opentracing": "^0.13.0",
+    "request-promise": "^4.2.1"
   }
 }

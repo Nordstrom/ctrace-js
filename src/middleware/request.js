@@ -2,7 +2,10 @@ import {parse as urlParse} from 'url'
 import 'opentracing'
 import tracer from '../'
 
-const _global = {}
+const _global = {
+  request: require('request-promise'),
+  config: {}
+}
 
 function handleResponse (span, status, err, msg) {
   if (err || status >= 300) {

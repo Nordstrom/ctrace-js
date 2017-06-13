@@ -3,7 +3,6 @@
 const should = require('should')
 const urlParse = require('url').parse
 const http = require('http')
-const rp = require('request-promise')
 const request = require('request')
 const Stream = require('./util/stream.js')
 const tracer = require('../src')
@@ -58,7 +57,6 @@ describe('request', () => {
   beforeEach(() => {
     let stream = new Stream()
     buf = stream.buf
-    tr.init(rp)
     tracer.init({stream})
     timestamp = Date.now() * 1000
   })
