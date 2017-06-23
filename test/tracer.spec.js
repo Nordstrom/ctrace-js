@@ -1,7 +1,7 @@
 'use strict'
 
 const should = require('should')
-
+const _ = require('lodash')
 const tracer = require('../src')
 const Stream = require('./util/stream.js')
 
@@ -118,6 +118,35 @@ describe('tracer', () => {
           'bag-n2': 'val2'
         }
       })
+    })
+
+    it('should log events by level', () => {
+      let ctx = { span: tracer.startSpan('originating', () => {}) }
+
+      tracer.debug(ctx, 'DebugEvent', { foo: 'bar' })
+      tracer.info(ctx, 'InfoEvent', { foo: 'bar' })
+      tracer.warn(ctx, 'WarnEvent', { foo: 'bar' })
+      tracer.error(ctx, 'ErrorEvent', { foo: 'bar' })
+
+      let logs = ctx.span._fields.logs
+      let debugEvent = _.omit(_.find(logs, (log) => {
+        return log.level === 'debug'
+      }), ['timestamp'])
+      let infoEvent = _.omit(_.find(logs, (log) => {
+        return log.level=== 'info'
+      }), ['timestamp'])
+      let warnEvent = _.omit(_.find(logs, (log) => {
+        return log.level === 'warn'
+      }), ['timestamp'])
+      let errorEvent = _.omit(_.find(logs, (log) => {
+        return log.level === 'error'
+      }), ['timestamp'])
+
+      debugEvent.should.eql({ foo: 'bar', event: 'DebugEvent', level: 'debug', debug: true })
+      infoEvent.should.eql({ foo: 'bar', event: 'InfoEvent', level: 'info' })
+      warnEvent.should.eql({ foo: 'bar', event: 'WarnEvent', level: 'warn' })
+      errorEvent.should.eql({ foo: 'bar', event: 'ErrorEvent', level: 'error', error: true })
+
     })
   })
 
