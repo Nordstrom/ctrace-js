@@ -268,6 +268,8 @@ Construct a new tracer for internal use only.  Use [GlobalTracer#init](#globaltr
     -   `options.multiEvent` **bool?** true for multi-event mode; otherwise, single-event mode
     -   `options.debug` **bool?** true for debug; otherwise, it is disabled
     -   `options.propagators` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [Propagators](#propagators)>?** optional propagators
+    -   `options.omitList` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)>?** optional, pass through to the encoder, Redacts values that match any array element, or removes keys
+    -   `options.urlSwapList` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)>?** optional, pass through to the encoder. Redacts only the 'http.url' and operation, if they match any elements 
 
 ### startSpan
 

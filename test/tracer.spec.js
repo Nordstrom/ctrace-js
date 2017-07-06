@@ -133,7 +133,7 @@ describe('tracer', () => {
         return log.level === 'debug'
       }), ['timestamp'])
       let infoEvent = _.omit(_.find(logs, (log) => {
-        return log.level=== 'info'
+        return log.level === 'info'
       }), ['timestamp'])
       let warnEvent = _.omit(_.find(logs, (log) => {
         return log.level === 'warn'
