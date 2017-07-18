@@ -210,7 +210,31 @@ describe('tracer', () => {
       }), ['timestamp'])
       debugEvent2.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
     })
-
+    describe('with service name', function () {
+      const serviceName = "TestService"
+      describe('from environment variable', function () {
+        beforeEach(() => {
+          process.env.ctrace_service_name = serviceName
+          tracer.init({stream})
+        })
+        afterEach(() => { delete process.env.ctrace_service_name })
+        it('tags should include service name', function () {
+          let span = tracer.startSpan('originating')
+          let fields = span._fields
+          fields.tags.service.should.equal(serviceName)
+        })
+      })
+      describe('from tracer options', function () {
+        beforeEach(() => {
+          tracer.init({stream, serviceName})
+        })
+        it('tags should include service name', function () {
+          let span = tracer.startSpan('originating')
+          let fields = span._fields
+          fields.tags.service.should.equal("TestService")
+        })
+      })
+    })
   })
 
   describe('with custom propagators', () => {
