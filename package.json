@@ -12,10 +12,15 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
     "coveralls": "nyc --reporter=text-lcov mocha | coveralls",
     "bench": "yarn run build && node ./bench.js",
-    "docs": "documentation build src/** -f md -o API.md --shallow",
+    "docs": "documentation readme src/** --section API",
     "start": "node ./demo.js"
   },
   "author": "@andyday",
+  "repository": "Nordstrom/ctrace-js",
+  "engines": {
+   "node": ">=4.3"
+  },
+
   "license": "Apache-2.0",
   "devDependencies": {
     "babel-cli": "^6.24.1",
