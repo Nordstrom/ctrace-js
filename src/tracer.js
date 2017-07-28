@@ -36,9 +36,8 @@ export default class Tracer {
    */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(new Encoder({
-        omitList: options.omitList || [],
-        urlSwapList: options.urlSwapList || []
-      }), options.stream)
+      omitList: options.omitList || []
+    }), options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
@@ -136,7 +135,7 @@ export default class Tracer {
 
     if (this.serviceName) {
       f.tags = f.tags || {}
-      f.tags["service"] = this.serviceName
+      f.tags['service'] = this.serviceName
     }
 
     if (baggage) {
