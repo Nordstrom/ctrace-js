@@ -31,6 +31,8 @@ export default class Tracer {
    * @param {bool} [options.multiEvent] - true for multi-event mode; otherwise, single-event mode
    * @param {bool} [options.debug] - true for debug; otherwise, it is disabled
    * @param {object.<string, Propagators>} [options.propagators] - optional propagators
+   * @param {string} [options.serviceName] - allows the configuration of the "service" tag for the entire Tracer if not
+   *                                         specified here, can also be set using env variable "ctrace_service_name"
    */
   constructor (options = {}) {
     this._reporter = options.reporter || new Reporter(new Encoder({
@@ -38,8 +40,7 @@ export default class Tracer {
         urlSwapList: options.urlSwapList || []
       }), options.stream)
     this.multiEvent = options.multiEvent || false
-    this.debug = options.debug || false
-
+    this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}
 
     if (!options.replacePropagators) {
@@ -54,6 +55,8 @@ export default class Tracer {
         this._propagation[key] = (list || []).concat(props[key])
       }
     }
+    // Can specify "service" tag for the entire Tracer using options or environment variable "ctrace_service_name"
+    this.serviceName = options.serviceName || process.env.ctrace_service_name
   }
 
   // ---------------------------------------------------------------------- //
@@ -87,7 +90,6 @@ export default class Tracer {
    */
   startSpan (name, options = {}) {
     const now = Date.now() * 1000
-
     let ref = (options.childOf && options.childOf._fields) || options.childOf
 
     const spanId = genId()
@@ -124,11 +126,17 @@ export default class Tracer {
       }
     }
 
+    f.debug = options.debug || false
     f.operation = name
     f.start = now
 
     if (options.tags) {
       f.tags = options.tags
+    }
+
+    if (this.serviceName) {
+      f.tags = f.tags || {}
+      f.tags["service"] = this.serviceName
     }
 
     if (baggage) {
@@ -213,6 +221,10 @@ export default class Tracer {
   }
 
   report (fields) {
+    // if tracer.debug is false and span.debug is true, don't log this span
+    if (!this.debug && fields.debug) {
+      return
+    }
     return this._reporter.report(fields)
   }
 
