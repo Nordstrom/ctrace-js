@@ -1,12 +1,13 @@
 import os from 'os'
 import url, {URL} from 'url'
-const redactMessage = '***'
+import querystring from 'querystring'
 const stringify = JSON.stringify
-
 import find from 'lodash.find'
 import map from 'lodash.map'
 import isObject from 'lodash.isobject'
+
 import forOwn from 'lodash.forown'
+const redactMessage = '***'
 
 export default class Encoder {
   constructor (options = {}) {
@@ -59,26 +60,38 @@ export default class Encoder {
     } catch (e) {
       return this.parseV1Url(uri)
     }
-    return uri
   }
 
   parseV2Url (uri) {
     let myURL = new URL(uri)
-    myURL.username = myURL.username ? '***' : null
-    myURL.password = myURL.password ? '***' : null
-    let query = myURL.searchParams
-    for (const name of query.keys()) {
+    myURL.username = myURL.username === '' ? '' : redactMessage
+    myURL.password = myURL.password === '' ? '' : redactMessage
+    let query = querystring.parse(myURL.search.substring(1))
+
+    let newQuery = ''
+    let keys = Object.keys(query)
+    for (let i =0; i < keys.length; i++) {
+      let name = keys[i]
+      if(newQuery.length === 0){
+        newQuery = '?'
+      } else {
+        newQuery += '&'
+      }
       if (this.findMatch(name)) {
-        myURL.searchParams.set(name, '***')
+        newQuery += name + "=" + redactMessage
+      } else {
+        newQuery += name + "=" + query[name]
       }
     }
+
+    myURL.search = newQuery
 
     return myURL.toString()
   }
 
   parseV1Url (uri) {
     let myURL = url.parse(uri, true)
-    myURL.auth = myURL.auth ? '***:***' : null
+    myURL.auth = myURL.auth ? redactMessage + ':' + redactMessage : undefined
     myURL.query = this.clean(myURL.query)[0]
     myURL.search = undefined
 
