@@ -92,4 +92,19 @@ describe('encoder', () => {
       '{"traceId":"undefined","spanId":"undefined","operation":"undefined","start":undefined,"tags":{"http.url":"example.com?foo=***&baz=***"}}' + os.EOL
     )
   })
+
+  it('should redact username and password from the http.url', function () {
+    let encoded = new Encoder({
+      omitList: [
+        'foo',
+        'baz'
+      ]
+    }).encode({
+      tags: {'http.url': 'http://open:tracing@example.com?foo=bar&baz=bloop'}
+    })
+
+    encoded.should.equal(
+      '{"traceId":"undefined","spanId":"undefined","operation":"undefined","start":undefined,"tags":{"http.url":"http://***:***@example.com/?foo=***&baz=***"}}' + os.EOL
+    )
+  })
 })

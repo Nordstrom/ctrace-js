@@ -1,4 +1,5 @@
 import os from 'os'
+import url, {URL} from 'url'
 const redactMessage = '***'
 const stringify = JSON.stringify
 
@@ -52,21 +53,36 @@ export default class Encoder {
     return `${prefix}${tags}${logs}${baggage}}${os.EOL}`
   }
 
-  parseUrl (url) {
-    let query = url.split('?')
-    if (!query[1]) {
-      return url
+  parseUrl (uri) {
+    try {
+      return this.parseV2Url(uri)
+    } catch (e) {
+      return this.parseV1Url(uri)
     }
-    let entries = query[1].split('&')
-    let included = []
-    for (let i = 0; i < entries.length; i++) {
-      let entry = entries[i].split('=')
-      if (this.findMatch(entry[0])) {
-        entry[1] = this.error
+    return uri
+  }
+
+  parseV2Url (uri) {
+    let myURL = new URL(uri)
+    myURL.username = myURL.username ? '***' : null
+    myURL.password = myURL.password ? '***' : null
+    let query = myURL.searchParams
+    for (const name of query.keys()) {
+      if (this.findMatch(name)) {
+        myURL.searchParams.set(name, '***')
       }
-      included.push(entry.join('='))
     }
-    return query[0] + '?' + included.join('&')
+
+    return myURL.toString()
+  }
+
+  parseV1Url (uri) {
+    let myURL = url.parse(uri, true)
+    myURL.auth = myURL.auth ? '***:***' : null
+    myURL.query = this.clean(myURL.query)[0]
+    myURL.search = undefined
+
+    return url.format(myURL)
   }
 
   findMatch (el) {
