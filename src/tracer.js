@@ -133,7 +133,7 @@ export default class Tracer {
 
     if (this.serviceName) {
       f.tags = f.tags || {}
-      f.tags["service"] = this.serviceName
+      f.tags['service'] = this.serviceName
     }
 
     if (baggage) {

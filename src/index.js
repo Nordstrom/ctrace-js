@@ -14,7 +14,7 @@ function logFn (level) {
     } else if (level === 'error') {
       data = Object.assign({ error: true }, data)
     }
-    ctx.span.log(Object.assign({ event: event , level: level}, data))
+    ctx.span.log(Object.assign({event: event, level: level}, data))
   }
 }
 tracer.debug = logFn('debug')
