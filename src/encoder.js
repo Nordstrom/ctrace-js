@@ -1,25 +1,24 @@
 import os from 'os'
 import url, {URL} from 'url'
 import querystring from 'querystring'
-const stringify = JSON.stringify
 import find from 'lodash.find'
 import map from 'lodash.map'
 import isObject from 'lodash.isobject'
-
 import forOwn from 'lodash.forown'
+
+const stringify = JSON.stringify
 const redactMessage = '***'
 
 export default class Encoder {
   constructor (options = {}) {
-    this.watchKeys = options.omitList || []
-    this.error = redactMessage
+    this.redactList = options.redactList || []
   }
 
   encode (sp) {
     let prefix
     let operation = decodeURIComponent(sp.operation)
-    for (let i = 0; i < this.watchKeys.length; i++) {
-      operation = operation.replace(this.watchKeys[i], this.error)
+    for (let i = 0; i < this.redactList.length; i++) {
+      operation = operation.replace(this.redactList[i], redactMessage)
     }
 
     if (sp.parentId && sp.duration != null) {
@@ -40,15 +39,15 @@ export default class Encoder {
       if (sp.tags['http.url']) {
         sp.tags['http.url'] = this.parseUrl(sp.tags['http.url'])
       }
-      tags = `,"tags":${stringify(this.clean(sp.tags)[0])}`
+      tags = `,"tags":${stringify(this.clean(sp.tags))}`
     }
 
     if (sp.logs) {
-      logs = `,"logs":${stringify(this.clean(sp.logs)[0])}`
+      logs = `,"logs":${stringify(this.clean(sp.logs))}`
     }
 
     if (sp.baggage) {
-      baggage = `,"baggage":${stringify(this.clean(sp.baggage)[0])}`
+      baggage = `,"baggage":${stringify(this.clean(sp.baggage))}`
     }
 
     return `${prefix}${tags}${logs}${baggage}}${os.EOL}`
@@ -70,17 +69,17 @@ export default class Encoder {
 
     let newQuery = ''
     let keys = Object.keys(query)
-    for (let i =0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       let name = keys[i]
-      if(newQuery.length === 0){
+      if (newQuery.length === 0) {
         newQuery = '?'
       } else {
         newQuery += '&'
       }
       if (this.findMatch(name)) {
-        newQuery += name + "=" + redactMessage
+        newQuery += name + '=' + redactMessage
       } else {
-        newQuery += name + "=" + query[name]
+        newQuery += name + '=' + query[name]
       }
     }
 
@@ -92,15 +91,15 @@ export default class Encoder {
   parseV1Url (uri) {
     let myURL = url.parse(uri, true)
     myURL.auth = myURL.auth ? redactMessage + ':' + redactMessage : undefined
-    myURL.query = this.clean(myURL.query)[0]
+    myURL.query = this.clean(myURL.query)
     myURL.search = undefined
 
     return url.format(myURL)
   }
 
   findMatch (el) {
-    const watchKeys = this.watchKeys
-    return !!find(watchKeys, function (k) {
+    const redactList = this.redactList
+    return !!find(redactList, function (k) {
       if (typeof (k) === 'string') {
         return el === k
       } else if (typeof (k) === 'object') {
@@ -111,9 +110,9 @@ export default class Encoder {
     })
   }
 
-  clean () {
+  clean (obj) {
     const gcache = []
-    const error = this.error
+    const error = redactMessage
     const findMatch = this.findMatch
     const that = this
 
@@ -141,10 +140,6 @@ export default class Encoder {
       return el
     }
 
-    let cleaned = {}
-    forOwn(arguments, function (v, k) {
-      cleaned[k] = internalSwap(v)
-    })
-    return cleaned
+    return internalSwap(obj)
   }
 }

@@ -1,5 +1,4 @@
 export default class TextPropagator {
-
   constructor (opts) {
     if (!opts) opts = {}
     this.traceIdKey = opts.traceIdKey || 'ct-trace-id'

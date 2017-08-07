@@ -34,7 +34,7 @@ describe('encoder', () => {
   })
 
   it('should redact values', () => {
-    let encoded = new Encoder({omitList: [/redact/]}).encode({
+    let encoded = new Encoder({redactList: [/redact/]}).encode({
       traceId: 'abc',
       spanId: 'def',
       parentId: 'ghi',
@@ -65,7 +65,7 @@ describe('encoder', () => {
 
   it('should redact from the operation', function () {
     let encoded = new Encoder({
-      omitList: [
+      redactList: [
         /foo=[\w|\s]+/g,
         /baz=[\w|\s]+/g
       ]
@@ -80,7 +80,7 @@ describe('encoder', () => {
 
   it('should redact from the http.url', function () {
     let encoded = new Encoder({
-      omitList: [
+      redactList: [
         'foo',
         'baz'
       ]
@@ -95,7 +95,7 @@ describe('encoder', () => {
 
   it('should redact username and password from the http.url', function () {
     let encoded = new Encoder({
-      omitList: [
+      redactList: [
         'foo',
         'baz'
       ]
