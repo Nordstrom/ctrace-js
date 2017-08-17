@@ -1,7 +1,5 @@
 {
-  "presets": [
-    "node6"
-  ],
+  "presets": ["env"],
   "plugins": [
     "add-module-exports",
     "istanbul"
