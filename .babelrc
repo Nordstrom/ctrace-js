@@ -1,9 +1,6 @@
 {
   "presets": [
-    ["env", {"targets": {
-        "node": "current"
-      }}
-    ]
+    "node6"
   ],
   "plugins": [
     "add-module-exports",

@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "standard src/**/*.js test/**/*.js | snazzy",
     "fix": "standard --fix",
-    "build": "babel src/ -d lib/",
+    "build": "babel src/ -d lib/ --no-babelrc --presets=node6 --plugins=add-module-exports",
     "prepublish": "yarn run build",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
