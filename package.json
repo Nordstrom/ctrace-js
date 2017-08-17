@@ -7,6 +7,7 @@
     "lint": "standard src/**/*.js test/**/*.js | snazzy",
     "fix": "standard --fix",
     "build": "babel src/ -d lib/ --no-babelrc --presets=node6 --plugins=add-module-exports",
+    "clean": "rm -fr lib",
     "prepublish": "yarn run build",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
@@ -18,7 +19,7 @@
   "author": "@andyday",
   "repository": "Nordstrom/ctrace-js",
   "engines": {
-    "node": ">=4.3"
+    "node": ">=6"
   },
   "license": "Apache-2.0",
   "devDependencies": {
