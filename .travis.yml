@@ -17,3 +17,4 @@ deploy:
     tags: true
     repo: Nordstrom/ctrace-js
     node: '6'
+    skip_cleanup: true
