@@ -10,6 +10,7 @@ after_success:
 - npm run coveralls
 - npm run bench
 deploy:
+  skip_cleanup: true
   provider: npm
   email: $NPM_EMAIL
   api_key: $NPM_TOKEN
@@ -17,4 +18,3 @@ deploy:
     tags: true
     repo: Nordstrom/ctrace-js
     node: '6'
-    skip_cleanup: true
