@@ -8,7 +8,7 @@ const _global = {
 }
 
 function handleResponse (span, status, err, msg) {
-  if (err || status >= 400) {
+  if (err instanceof Error || status >= 400) {
     // Error detected.  Mark error, status code, and log error event
     span.setTag('error', true)
     if (status) span.setTag('http.status_code', status)
