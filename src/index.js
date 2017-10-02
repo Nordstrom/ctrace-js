@@ -6,6 +6,7 @@ import request from './middleware/request'
 const tracer = Object.assign(new GlobalTracer(), opentracing)
 tracer.express = express
 tracer.request = request
+const logLevels = ['debug', 'info', 'warn', 'error']
 
 function logFn (level) {
   return function log (ctx, event, data) {
@@ -17,9 +18,9 @@ function logFn (level) {
     ctx.span.log(Object.assign({event: event, level: level}, data))
   }
 }
-tracer.debug = logFn('debug')
-tracer.info = logFn('info')
-tracer.warn = logFn('warn')
-tracer.error = logFn('error')
+
+for (let i = 0; i < logLevels.length; i++) {
+  tracer[logLevels[i]] = logFn(logLevels[i])
+}
 
 export default tracer

@@ -4,7 +4,7 @@ require('should')
 
 const os = require('os')
 const Reporter = require('../src/reporter.js')
-const encoder = require('../src/encoder.js')
+const Encoder = require('../src/encoder.js')
 const Stream = require('./util/stream.js')
 
 describe('reporter', () => {
@@ -13,7 +13,7 @@ describe('reporter', () => {
   before(() => {
     stream = new Stream()
     buf = stream.buf
-    reporter = new Reporter(encoder, stream)
+    reporter = new Reporter(new Encoder(), stream)
   })
 
   it('should report span', () => {

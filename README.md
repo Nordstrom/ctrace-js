@@ -503,6 +503,7 @@ context propagation (ie. inject, extract).
 **Parameters**
 
 -   `options`   (optional, default `{}`)
+    -   `options.redactList` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)>?** optional list of keys, when matched, replaces values with `***`
 
 #### constructor
 

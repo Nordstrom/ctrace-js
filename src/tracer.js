@@ -1,8 +1,8 @@
-import {FORMAT_HTTP_HEADERS, FORMAT_TEXT_MAP} from 'opentracing'
+import { FORMAT_HTTP_HEADERS, FORMAT_TEXT_MAP } from 'opentracing'
 import Span from './span.js'
 import Reporter from './reporter.js'
 import Encoder from './encoder.js'
-import {randomBytes as rb} from 'crypto'
+import { randomBytes as rb } from 'crypto'
 import TextPropagator from './propagators/textPropagator'
 
 const bth = []
@@ -35,7 +35,9 @@ export default class Tracer {
    *                                         specified here, can also be set using env variable "ctrace_service_name"
    */
   constructor (options = {}) {
-    this._reporter = options.reporter || new Reporter(Encoder, options.stream)
+    this._reporter = options.reporter || new Reporter(new Encoder({
+      redactList: options.redactList || []
+    }), options.stream)
     this.multiEvent = options.multiEvent || false
     this.debug = options.debug || process.env.ctrace_debug === 'true' || false
     this._propagation = {}

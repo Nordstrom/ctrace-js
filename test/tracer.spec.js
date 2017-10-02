@@ -122,11 +122,10 @@ describe('tracer', () => {
   })
 
   describe('with debug settings', () => {
-
     function createEvents (isTracerDebug, isSpanDebug) {
       tracer.init({ stream, debug: isTracerDebug })
       let span = tracer.startSpan('originating', { debug: isSpanDebug }, () => {})
-      let ctx = { span:  span }
+      let ctx = { span: span }
 
       tracer.debug(ctx, 'DebugEvent', { foo: 'bar' })
       tracer.info(ctx, 'InfoEvent', { foo: 'bar' })
@@ -140,7 +139,7 @@ describe('tracer', () => {
         return log.level === 'debug'
       }), ['timestamp'])
       let infoEvent = _.omit(_.find(logs, (log) => {
-        return log.level=== 'info'
+        return log.level === 'info'
       }), ['timestamp'])
       let warnEvent = _.omit(_.find(logs, (log) => {
         return log.level === 'warn'
@@ -211,7 +210,7 @@ describe('tracer', () => {
       debugEvent2.should.eql({ event: 'Debug Log', level: 'debug', debug: true })
     })
     describe('with service name', function () {
-      const serviceName = "TestService"
+      const serviceName = 'TestService'
       describe('from environment variable', function () {
         beforeEach(() => {
           process.env.ctrace_service_name = serviceName
@@ -231,7 +230,7 @@ describe('tracer', () => {
         it('tags should include service name', function () {
           let span = tracer.startSpan('originating')
           let fields = span._fields
-          fields.tags.service.should.equal("TestService")
+          fields.tags.service.should.equal('TestService')
         })
       })
     })
