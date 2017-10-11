@@ -504,7 +504,7 @@ context propagation (ie. inject, extract).
 
 -   `options`   (optional, default `{}`)
     -   `options.redactList` **[object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)&lt;[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), [RegExp](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp)>?** optional list of keys, when matched, replaces values with `***`
-
+    -   `options.ignoreRoutes` **[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)?** optional list of routes to ignore. These routes will not generate a trace in the logs.
 #### constructor
 
 Construct a new tracer for internal use only.  Use [GlobalTracer#init](#globaltracerinit) to set global trace options.

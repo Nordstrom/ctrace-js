@@ -12,11 +12,20 @@ const redactMessage = '***'
 export default class Encoder {
   constructor (options = {}) {
     this.redactList = options.redactList || []
+    this.ignoreRoutes = options.ignoreRoutes || {}
   }
 
   encode (sp) {
     let prefix
     let operation = decodeURIComponent(sp.operation)
+
+    for (let i = 0; i < this.ignoreRoutes.length; i++) {
+      var route = this.ignoreRoutes[i]
+      if (route === operation) {
+        return
+      }
+    }
+
     for (let i = 0; i < this.redactList.length; i++) {
       operation = operation.replace(this.redactList[i], redactMessage)
     }
