@@ -21,7 +21,7 @@ export default class Encoder {
 
     for (let i = 0; i < this.ignoreRoutes.length; i++) {
       var route = this.ignoreRoutes[i]
-      if (route === operation) {
+      if (operation.indexOf(route) > -1) {
         return
       }
     }

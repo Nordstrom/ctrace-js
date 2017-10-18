@@ -18,7 +18,7 @@ describe('express middleware', () => {
     stream = new Stream()
     tracer.init({
       stream: stream,
-      ignoreRoutes: ['GET:/health']
+      ignoreRoutes: ['GET:/health', '/ignore']
     })
   })
 
@@ -34,16 +34,24 @@ describe('express middleware', () => {
     })
 
     // responds with 200
-    app.get('/hi', (req, res) => {
+    let routes = ['/hi', '/health', '/ignore']
+    for (let i = 0; i < routes.length; i++) {
+      app.get(routes[i], (req, res) => {
+        setTimeout(function () {
+          res.send({ data: routes[i].substring(1) })
+        }, 5)
+      })
+    }
+
+    app.post('/health', (req, res) => {
       setTimeout(function () {
-        res.send({data: 'hi'})
+        res.send({ data: 'health' })
       }, 5)
     })
 
-    // responds with 200
-    app.get('/health', (req, res) => {
+    app.post('/ignore', (req, res) => {
       setTimeout(function () {
-        res.send({data: 'health'})
+        res.send({ data: 'ignore' })
       }, 5)
     })
 
@@ -80,7 +88,27 @@ describe('express middleware', () => {
         .then(function () {
           should.not.exist(stream.buf[0])
         })
-
+      })
+      it('should log trace to POST:/health', () => {
+        // this should log a trace because we have GET:/health in ignore routes, but not POST:/health or simply /health.
+        return request({ method: 'POST', url: `${url}/health`})
+        .then(function () {
+          let record = stream.getJSON(0)
+          record.should.have.tag('span.kind', 'server')
+          record.should.have.tag('component', 'ctrace-express')
+        })
+      })
+      it('should not log trace for any HTTP method to route /ignore', () => {
+        return request({method: 'GET', url: `${url}/ignore`})
+        .then(function () {
+          should.not.exist(stream.buf[0])
+        })
+        .then(function () {
+          return request({method: 'POST', url: `${url}/ignore`})
+          .then(function () {
+            should.not.exist(stream.buf[0])
+          })
+        })
       })
       it('should log trace for GET:/hi', () => {
         return request({method: 'GET', url: `${url}/hi`})
