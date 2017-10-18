@@ -6,6 +6,10 @@ export default class Reporter {
 
   report (spanFields) {
     let encoded = this.encoder.encode(spanFields)
+    // if route is in the ignoreList, encoded may be undefined here
+    if (!encoded) {
+      return
+    }
     this.stream.write(encoded)
   }
 }
