@@ -12,7 +12,7 @@ const redactMessage = '***'
 export default class Encoder {
   constructor (options = {}) {
     this.redactList = options.redactList || []
-    this.ignoreRoutes = options.ignoreRoutes || {}
+    this.ignoreRoutes = options.ignoreRoutes || []
   }
 
   encode (sp) {
