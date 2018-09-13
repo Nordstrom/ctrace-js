@@ -130,11 +130,14 @@ export default class Encoder {
         })
         el = cache
       } else if (typeof el === 'string') {
+        let jsonObj
         try {
-          let jsonObj = JSON.parse(el)
-          return internalSwap(jsonObj)
+          jsonObj = JSON.parse(el)
         } catch (err) {
           // string is not JSON, ignore it
+        }
+        if (jsonObj) {
+          return internalSwap(jsonObj)
         }
       }
       return el
