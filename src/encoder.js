@@ -136,4 +136,3 @@ export default class Encoder {
     return internalSwap(obj)
   }
 }
-0
