@@ -129,6 +129,13 @@ export default class Encoder {
           }
         })
         el = cache
+      } else if (typeof el === 'string') {
+        try {
+          let jsonObj = JSON.parse(el)
+          return internalSwap(jsonObj)
+        } catch (err) {
+          // string is not JSON, ignore it
+        }
       }
       return el
     }
@@ -136,3 +143,4 @@ export default class Encoder {
     return internalSwap(obj)
   }
 }
+0
