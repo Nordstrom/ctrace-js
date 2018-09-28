@@ -129,6 +129,16 @@ export default class Encoder {
           }
         })
         el = cache
+      } else if (typeof el === 'string') {
+        let jsonObj
+        try {
+          jsonObj = JSON.parse(el)
+        } catch (err) {
+          // string is not JSON, ignore it
+        }
+        if (jsonObj) {
+          return internalSwap(jsonObj)
+        }
       }
       return el
     }
